@@ -1,0 +1,27 @@
+// Colors
+$primary-color: #253e6b;
+$secondary-color: #e77a28;
+$third-color: #3489c2;
+$white: #ffffff;
+$bg-light: #D0E5FB;
+
+// Font
+$font-family: 'Poppins', sans-serif;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-top: 87px; // Space for fixed navbar
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  
+  .content-wrapper {
+    margin: 0;
+    width: 100%;
+  }
+}

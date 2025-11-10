@@ -1,0 +1,93 @@
+<nav class="navbar" [class.scrolled]="isScrolled">
+  <div class="navbar-container">
+    <!-- Logo -->
+    <div class="navbar-logo">
+      <a href="/">
+        <img src="/favicon.ico" alt="W9ayt Delivery Logo" class="logo-image">
+      </a>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="navbar-toggle" [class.active]="isMenuOpen" (click)="toggleMenu()" aria-label="Toggle navigation">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+
+    <!-- Navigation Links -->
+    <div class="navbar-menu" [class.active]="isMenuOpen">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a href="/home" class="nav-link" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a href="#how-it-works" class="nav-link">How it Works</a>
+        </li>
+        <li class="nav-item">
+          <a href="/become-a-company" class="nav-link" routerLink="/become-a-company" routerLinkActive="active">Become a company</a>
+        </li>
+        <li class="nav-item">
+          <a href="#contact" class="nav-link">Contact</a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Auth Actions: Profile Dropdown or Get Started -->
+    @if (isloggedIn()) {
+      <div class="profile-wrapper">
+        <button class="profile-button" (click)="toggleProfile()" aria-label="Profile menu">
+          <!-- Profile Icon -->
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="profile-icon">
+            <circle cx="12" cy="12" r="11" fill="#e0e0e0" stroke="#666" stroke-width="1"/>
+            <circle cx="12" cy="9" r="3.5" fill="#666"/>
+            <path d="M5 19c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <!-- Dropdown Menu -->
+        @if (isProfileOpen) {
+          <div class="profile-dropdown">
+            <div class="profile-header">
+              <div class="profile-avatar">
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="11" fill="#e0e0e0"/>
+                  <circle cx="12" cy="9" r="3.5" fill="#666"/>
+                  <path d="M5 19c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="profile-info">
+                <div class="profile-name">{{ currentUser?.name || 'User' }}</div>
+                <div class="profile-email">{{ currentUser?.email || '' }}</div>
+              </div>
+            </div>
+
+            <ul class="profile-menu">
+              <li>
+                <a routerLink="/profile" (click)="isProfileOpen = false">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="8" r="3" stroke="currentColor" stroke-width="2"/>
+                    <path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  <span>Profile</span>
+                </a>
+              </li>
+              <li>
+                <button (click)="logout()">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>Log out</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+        }
+      </div>
+    }@else{
+      <!-- Get Started Button -->
+      <div class="navbar-cta" [class.active]="isMenuOpen">
+        <button class="btn-get-started" routerLink="/login">Get Started</button>
+      </div>
+    }
+  </div>
+</nav>

@@ -1,0 +1,88 @@
+<div class="login-page">
+  <!-- Home Button -->
+  <a routerLink="/" class="home-button">
+    <i class="fas fa-home"></i> Home
+  </a>
+
+  <!-- Decorative Shapes -->
+  <div class="diagonal-shape top-shape"></div>
+  <div class="diagonal-shape bottom-shape"></div>
+
+  <!-- Floating Icons -->
+  <div class="floating-icons">
+    <i class="fas fa-truck floating-icon icon-1"></i>
+    <i class="fas fa-box floating-icon icon-2"></i>
+    <i class="fas fa-map-marker-alt floating-icon icon-3"></i>
+    <i class="fas fa-route floating-icon icon-4"></i>
+    <i class="fas fa-shipping-fast floating-icon icon-5"></i>
+    <i class="fas fa-map-marked-alt floating-icon icon-6"></i>
+    <i class="fas fa-box-open floating-icon icon-7"></i>
+    <i class="fas fa-location-arrow floating-icon icon-8"></i>
+    <i class="fas fa-dolly floating-icon icon-9"></i>
+    <i class="fas fa-road floating-icon icon-10"></i>
+  </div>
+
+  <div class="login-container">
+    <!-- Left Side - Illustration -->
+    <div class="illustration-section">
+      <img src="/login_illu.png" alt="Delivery illustration" class="login-illustration" draggable="false">
+    </div>
+
+    <!-- Right Side - Login Form -->
+    <div class="form-section">
+      <div class="login-form-wrapper">
+        <h2 class="form-title">Login</h2>
+        <div class="title-underline"></div>
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" class="form-control" formControlName="email"
+              placeholder="youremail@domain.com" />
+
+            @if (submitted() && f.email.errors?.['required']) {
+            <small class="error-text">Email is required</small>
+
+            }
+            @if (submitted() && f.email.errors?.['email']) {
+            <small class="error-text">Enter a valid email</small>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" class="form-control" formControlName="password"
+              placeholder="••••••••••••" />
+            @if (submitted() && f.password.errors?.['required']) {
+            <small class="error-text">Password is required</small>
+            }
+          </div>
+
+          <div class="forgot-password">
+            <a href="#" class="forgot-link">Forgot password?</a>
+          </div>
+
+          @if (errorMessage()) {
+
+          <div class="alert alert-danger">{{ errorMessage() }}</div>
+          }
+
+          <button type="submit" class="login-btn" [disabled]="loading()">
+            {{ loading() ? 'Logging in...' : 'Login' }}
+          </button>
+
+          <div class="divider"><span class="divider-text">Or</span></div>
+
+          <div class="social-buttons">
+            <button type="button" class="social-btn google-btn">
+              <i class="fab fa-google"></i>
+              Google Account
+            </button>
+            <button type="button" class="social-btn create-btn" routerLink="/signup">
+              Create Account
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
