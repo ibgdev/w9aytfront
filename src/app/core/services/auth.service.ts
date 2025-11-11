@@ -31,6 +31,10 @@ export interface SignUpResponse {
   errors?: Array<{ field: string; message: string }>;
 }
 
+export interface ForgotPasswordResponse{
+  message: string
+}
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -62,6 +66,12 @@ export class AuthService {
       .pipe(catchError(this.handleError));
   }
 
+  forgotPassword(email: string): Observable<ForgotPasswordResponse>{
+    return this.http
+    .post<ForgotPasswordResponse>(`${this.API_URL}/forgot-password`, { email })
+    .pipe(catchError(this.handleError));
+  }
+
   saveSession(token: string, user: User): void {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
@@ -88,6 +98,8 @@ export class AuthService {
     }
     return !!localStorage.getItem('token');
   }
+
+  
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An error occurred';

@@ -1,17 +1,25 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CompanyService, Company } from '../../../core/services/company-signup.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-company-signup',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './company-signup.html',
-  styleUrls: ['./company-signup.scss']
+  styleUrls: ['./company-signup.scss'],
 })
-export class CompanySignup {
+export class CompanySignup implements OnInit {
+  private auth = inject(AuthService);
+
+  ngOnInit(): void {
+    if (this.auth.isLoggedIn()) {
+      this.router.navigateByUrl('/home');
+    }
+  }
   private fb = inject(FormBuilder);
   private companyService = inject(CompanyService);
   private router = inject(Router);
@@ -24,18 +32,27 @@ export class CompanySignup {
   selectedFile: File | null = null;
 
   constructor() {
-    this.signupForm = this.fb.group({
-      companyName: ['', [Validators.required, Validators.minLength(2)]],
-      legalStatus: ['', [Validators.required]],
-      taxId: ['', [Validators.required]],
-      phone: ['', [Validators.required, Validators.pattern(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/)]],
-      email: ['', [Validators.required, Validators.email]],
-      Address: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]],
-      rightsConfirmation: [false, [Validators.requiredTrue]],
-      termsAcceptance: [false, [Validators.requiredTrue]]
-    }, { validators: this.passwordMatchValidator });
+    this.signupForm = this.fb.group(
+      {
+        companyName: ['', [Validators.required, Validators.minLength(2)]],
+        legalStatus: ['', [Validators.required]],
+        taxId: ['', [Validators.required]],
+        phone: [
+          '',
+          [
+            Validators.required,
+            Validators.pattern(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/),
+          ],
+        ],
+        email: ['', [Validators.required, Validators.email]],
+        Address: ['', [Validators.required]],
+        password: ['', [Validators.required, Validators.minLength(6)]],
+        confirmPassword: ['', [Validators.required]],
+        rightsConfirmation: [false, [Validators.requiredTrue]],
+        termsAcceptance: [false, [Validators.requiredTrue]],
+      },
+      { validators: this.passwordMatchValidator }
+    );
   }
 
   passwordMatchValidator(group: FormGroup) {
@@ -78,7 +95,7 @@ export class CompanySignup {
 
   onSubmit(): void {
     // Marquer tous les champs comme touchés pour afficher les erreurs
-    Object.keys(this.signupForm.controls).forEach(key => {
+    Object.keys(this.signupForm.controls).forEach((key) => {
       this.signupForm.get(key)?.markAsTouched();
     });
 
@@ -100,9 +117,9 @@ export class CompanySignup {
     console.log('Sending registration request...');
 
     const formValues = this.signupForm.value;
-    
+
     console.log('Form values being sent:', formValues);
-    
+
     const company: Company = {
       name: formValues.companyName,
       legal_status: formValues.legalStatus,
@@ -110,10 +127,10 @@ export class CompanySignup {
       phone: formValues.phone,
       email: formValues.email,
       address: formValues.Address,
-      password: formValues.password
+      password: formValues.password,
       // logo_url will be handled by the file upload
     };
-    
+
     console.log('Company object to send:', company);
 
     this.companyService.registerCompany(company, this.selectedFile).subscribe({
@@ -121,43 +138,36 @@ export class CompanySignup {
         console.log('Inscription réussie !', response);
         this.companyService.saveUserInfo(response.user_id, response.company_id);
         this.isLoading = false;
-        
+
         // Show success message instead of alert
-        this.successMessage = 'Company registered successfully! Redirecting...';
+        this.successMessage =
+          'Company registered successfully! an Administrator will contact you soon, Redirecting...';
         this.errorMessage = '';
-        
+
         // Force change detection
         this.cdr.detectChanges();
-        
+
         // Redirect after 2 seconds
         setTimeout(() => {
           this.router.navigate(['/home']);
-        }, 2000);
+        }, 4000);
       },
       error: (error) => {
-        console.error('=== ERROR OCCURRED ===');
-        console.error('Erreur complète:', error);
-        console.error('Error status:', error.status);
-        console.error('Error message:', error.message);
-        console.error('Error details:', error.error);
-        
         this.isLoading = false;
         this.successMessage = '';
-        
+
         // Check for duplicate email error - backend might return 500 with duplicate key error
         const errorDetails = (error.error?.details || '').toLowerCase();
         const errorMessage = error.error?.message || error.error?.error || '';
         const errorString = JSON.stringify(error.error || '').toLowerCase();
-        
-        console.log('Error details string:', errorDetails);
-        console.log('Error message string:', errorMessage);
-        console.log('Full error JSON:', errorString);
-        
+
         // Only show "email already registered" if we detect duplicate entry error
         if (errorDetails === 'er_dup_entry' || errorDetails === 'ER_DUP_ENTRY') {
-          this.errorMessage = 'This email is already registered. Please use a different email or login instead.';
+          this.errorMessage =
+            'This email is already registered. Please use a different email or login instead.';
         } else if (error.status === 409) {
-          this.errorMessage = 'This email is already registered. Please use a different email or login instead.';
+          this.errorMessage =
+            'This email is already registered. Please use a different email or login instead.';
         } else if (errorMessage) {
           this.errorMessage = errorMessage;
         } else if (error.status === 500) {
@@ -165,17 +175,17 @@ export class CompanySignup {
         } else {
           this.errorMessage = 'An error occurred during registration. Please try again.';
         }
-        
+
         console.log('Setting errorMessage to:', this.errorMessage);
-        
+
         // Force Angular to detect the change
         this.cdr.detectChanges();
-        
+
         // Scroll to top to show error message
         setTimeout(() => {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }, 100);
-      }
+      },
     });
   }
 }

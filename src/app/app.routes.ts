@@ -3,6 +3,7 @@ import { SignUpComponent } from './features/authentication/sign-up/sign-up.compo
 import { Home } from './home/home';
 import { Login } from './features/authentication/login/login';
 import { CompanySignup } from './features/authentication/company-signup/company-signup';
+import { ForgotPassword } from './features/authentication/forgot-password/forgot-password';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -21,5 +22,9 @@ export const routes: Routes = [
   {
     path: 'become-a-company',
     component: CompanySignup 
+  },
+  {
+    path: 'forgot-password',
+    component: ForgotPassword
   }
 ];
