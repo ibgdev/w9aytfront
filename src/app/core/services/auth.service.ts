@@ -35,6 +35,26 @@ export interface ForgotPasswordResponse{
   message: string
 }
 
+export interface VerifyResetCodeRequest {
+  email: string;
+  code: string;
+}
+
+export interface VerifyResetCodeResponse {
+  message: string;
+  success: boolean;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  newPassword: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
+  success: boolean;
+}
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -70,6 +90,18 @@ export class AuthService {
     return this.http
     .post<ForgotPasswordResponse>(`${this.API_URL}/forgot-password`, { email })
     .pipe(catchError(this.handleError));
+  }
+
+  verifyResetCode(data: VerifyResetCodeRequest): Observable<VerifyResetCodeResponse> {
+    return this.http
+      .post<VerifyResetCodeResponse>(`${this.API_URL}/verify-reset-code`, data)
+      .pipe(catchError(this.handleError));
+  }
+
+  resetPassword(data: ResetPasswordRequest): Observable<ResetPasswordResponse> {
+    return this.http
+      .post<ResetPasswordResponse>(`${this.API_URL}/reset-password`, data)
+      .pipe(catchError(this.handleError));
   }
 
   saveSession(token: string, user: User): void {
