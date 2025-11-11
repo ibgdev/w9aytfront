@@ -1,0 +1,364 @@
+@use "sass:color";
+
+// Variables
+$primary-blue: #253E6B;
+$orange: #F47B3B;
+$white: #FFFFFF;
+$light-gray: #F5F5F5;
+$border-gray: #E0E0E0;
+$text-dark: #333333;
+$text-gray: #666666;
+$error-red: #dc3545;
+
+// Container principal
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+}
+
+// Container principal avec deux panneaux
+.signup-container {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+
+// Panneau gauche (Logo)
+.left-panel {
+  flex: 0 0 40%;
+  background: linear-gradient(135deg, $primary-blue 0%, #1a2d4d 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  
+  
+  .logo {
+    max-width: 400px;
+    width: 80%;
+    height: auto;
+    animation: fadeIn 0.8s ease-in;
+  }
+}
+
+// Panneau droit (Formulaire)
+.right-panel {
+  flex: 1;
+  background: $white;
+  padding: 2rem 3rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 100vh;
+
+  
+  h2 {
+    text-align: center;
+    color: $primary-blue;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-top: 10px;
+    letter-spacing: -0.5px;
+    position: relative;
+    padding-bottom: 0.75rem;
+    font-size: 50px;
+    
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: $orange;
+      border-radius: 2px;
+      
+    }
+  }
+  
+}
+
+// Formulaire
+form {
+  width: 100%;
+  max-width: 100%;
+  margin-top: 10px;
+  padding: 3.5rem 4.5rem;
+  background: $white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+// Alert Messages
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  margin-top: 10px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  animation: slideDown 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  span {
+    flex: 1;
+  }
+}
+
+.alert-error {
+  background: #fee;
+  color: $error-red;
+  border: 2px solid $error-red;
+  border-left: 4px solid $error-red;
+
+  svg {
+    color: $error-red;
+  }
+}
+
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+  border: 2px solid #28a745;
+  border-left: 4px solid #28a745;
+
+  svg {
+    color: #28a745;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Groupes de champs
+.form-group {
+  margin-bottom: 0.9rem;
+  
+  label {
+    display: block;
+    color: $text-dark;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+  }
+}
+
+// Ligne avec deux champs côte à côte
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5.5rem;
+  
+  .form-group {
+    margin-bottom: 0;
+  }
+}
+
+// Inputs et selects
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+select {
+  width: 100%;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid $border-gray;
+  border-radius: 6px;
+  font-size: 20px;
+  color: $text-dark;
+  background: $white;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  
+  &::placeholder {
+    color: #AAAAAA;
+    font-size: 15px;
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: $primary-blue;
+    box-shadow: 0 0 0 3px rgba(37, 62, 107, 0.1);
+  }
+  
+  &.ng-touched.ng-invalid {
+    border-color: $error-red;
+  }
+}
+
+// Select personnalisé
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23666' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+// Upload de fichier
+input[type="file"] {
+  width: 100%;
+  padding: 0.55rem;
+  border: 2px dashed $border-gray;
+  border-radius: 6px;
+  cursor: pointer;
+  background: $light-gray;
+  font-size: 0.8125rem;
+  
+  &:hover {
+    border-color: $primary-blue;
+    background: rgba(37, 62, 107, 0.05);
+  }
+}
+
+// Checkboxes
+.checkbox-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin: 0.85rem 0;
+  
+  input[type="checkbox"] {
+    margin-top: 0.2rem;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: $primary-blue;
+    flex-shrink: 0;
+  }
+  
+  label {
+    cursor: pointer;
+    font-size: 0.8125rem;
+    color: $text-gray;
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+// Messages d'erreur
+.error {
+  color: $error-red;
+  font-size: 0.8125rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.error-message {
+  background: #fee;
+  color: $error-red;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+// Bouton Submit
+.submit-btn {
+  width: 40%;
+  padding: 0.75rem 1.5rem;
+  background: $orange;
+  color: $white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1.25rem auto 0;
+  display: block;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(244, 123, 59, 0.3);
+  text-transform: none;
+  letter-spacing: 0.3px;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(244, 123, 59, 0.4);
+background: color.adjust($orange, $lightness: -8%);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  
+  &:disabled {
+    background: #D3D3D3;
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.7;
+  }
+}
+
+// Animation
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// Responsive
+@media (max-width: 1024px) {
+  .left-panel {
+    flex: 0 0 35%;
+  }
+}
+
+@media (max-width: 768px) {
+  .signup-container {
+    flex-direction: column;
+  }
+  
+  .left-panel {
+    flex: 0 0 200px;
+    
+    .logo {
+      max-width: 250px;
+    }
+  }
+  
+  .right-panel {
+    padding: 1.5rem;
+    
+    h2 {
+      font-size: 1.75rem;
+    }
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+  }
+}
