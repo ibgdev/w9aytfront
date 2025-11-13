@@ -21,7 +21,8 @@ export interface User {
   role: string;
   status: string;
   verified: number;
-  created_at: string;
+  created_at?: string;
+  createdAt?: string; // Support both naming conventions
 }
 
 export interface SignUpResponse {

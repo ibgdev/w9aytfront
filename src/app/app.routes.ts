@@ -6,6 +6,7 @@ import { CompanySignup } from './features/authentication/company-signup/company-
 import { ForgotPassword } from './features/authentication/forgot-password/forgot-password';
 import { ResetPassword } from './features/authentication/reset-password/reset-password';
 import { Notfound } from './notfound/notfound';
+import { Profile } from './features/client/profile/profile';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -32,6 +33,10 @@ export const routes: Routes = [
   {
     path: 'reset-password',
     component: ResetPassword
+  },
+  {
+    path: 'profile',
+    component: Profile
   },
   { 
     path: '**', component: Notfound
