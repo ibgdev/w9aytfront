@@ -19,7 +19,7 @@ export class Login implements OnInit {
   
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
-  private router = inject(Router); // Corrected import
+  private router = inject(Router); 
 
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],

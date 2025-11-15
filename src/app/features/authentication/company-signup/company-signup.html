@@ -1,0 +1,117 @@
+<div class="signup-container">
+    <div class="left-panel">
+        <img src="logo-orange.png" alt="Delivery Logo" class="logo" draggable="false">
+    </div>
+
+    <div class="right-panel">
+        <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+            <h2>Become a Company</h2>
+
+            <!-- Success Message Alert -->
+            <div class="alert alert-success" *ngIf="successMessage">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>{{ successMessage }}</span>
+            </div>
+
+            <!-- Error Message Alert -->
+            <div class="alert alert-error" *ngIf="errorMessage">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 8V12M12 16H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Company Name</label>
+                    <input type="text" formControlName="companyName" placeholder="Company Name">
+                    <span class="error" *ngIf="signupForm.get('companyName')?.touched">
+                        {{ getErrorMessage('companyName') }}
+                    </span>
+                </div>
+
+                <div class="form-group">
+                    <label>Legal Status</label>
+                    <input type="text" formControlName="legalStatus" placeholder="SARL, SA, Individual, etc.">
+                    <span class="error" *ngIf="signupForm.get('legalStatus')?.touched">
+                        {{ getErrorMessage('legalStatus') }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Tax ID</label>
+                    <input type="text" formControlName="taxId" placeholder="XXXXXXXXX/X/X/XXX">
+                    <span class="error" *ngIf="signupForm.get('taxId')?.touched">
+                        {{ getErrorMessage('taxId') }}
+                    </span>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" formControlName="phone" placeholder="+1 000 000">
+                    <span class="error" *ngIf="signupForm.get('phone')?.touched">
+                        {{ getErrorMessage('phone') }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" formControlName="email" placeholder="souarnia@domain.com">
+                <span class="error" *ngIf="signupForm.get('email')?.touched">
+                    {{ getErrorMessage('email') }}
+                </span>
+            </div>
+
+            <div class="form-group">
+                <label> Address</label>
+                <input type="text" formControlName="Address" placeholder="Your Street, number, bloc">
+                <span class="error" *ngIf="signupForm.get('Address')?.touched">
+                    {{ getErrorMessage('Address') }}
+                </span>
+            </div>
+
+
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" formControlName="password" placeholder="••••••••••••">
+                <span class="error" *ngIf="signupForm.get('password')?.touched">
+                    {{ getErrorMessage('password') }}
+                </span>
+            </div>
+
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" formControlName="confirmPassword" placeholder="••••••••••••">
+                <span class="error" *ngIf="signupForm.get('confirmPassword')?.touched">
+                    {{ getErrorMessage('confirmPassword') }}
+                </span>
+            </div>
+
+            <div class="form-group">
+                <label>Upload Company Logo</label>
+                <input type="file" (change)="onFileSelected($event)" accept="image/*">
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="rights" formControlName="rightsConfirmation">
+                <label for="rights">I confirm that I have all the rights to use the company information</label>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="terms" formControlName="termsAcceptance">
+                <label for="terms">I agree to all terms and policy</label>
+            </div>
+
+            <button type="submit" class="submit-btn" [disabled]="isLoading">
+                Sign Up
+            </button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,768 @@
+@use 'sass:color';
+
+// Colors
+$primary-color: #253e6b;
+$secondary-color: #e77a28;
+$third-color: #3489c2;
+$white: #ffffff;
+$bg-light: #f5f8fc;
+$text-dark: #2c3e50;
+$text-gray: #5a6c7d;
+$border-color: #e0e0e0;
+$error-red: #dc3545;
+$success-green: #28a745;
+$warning-orange: #ff9800;
+$danger-red: #f44336;
+
+// Font
+$font-family: 'Poppins', sans-serif;
+
+.profile-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f8fc 0%, #e8f1f8 100%);
+  padding: 2rem;
+  padding-top: 100px; // Add space for navbar
+  font-family: $font-family;
+
+  .profile-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: $white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  // Header Section
+  .profile-header {
+    background: linear-gradient(135deg, $primary-color 0%, #1a2d4d 100%);
+    padding: 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: $white;
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+
+      .user-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: $white;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .user-info {
+        h1 {
+          font-size: 2rem;
+          font-weight: 700;
+          margin: 0 0 0.5rem 0;
+        }
+
+        .user-email {
+          font-size: 1rem;
+          opacity: 0.9;
+          margin: 0 0 0.25rem 0;
+        }
+
+        .member-since {
+          font-size: 0.875rem;
+          opacity: 0.7;
+          margin: 0;
+        }
+      }
+    }
+
+    .logout-btn {
+      padding: 0.75rem 1.5rem;
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: $white;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+      }
+    }
+  }
+
+  // Tabs Navigation
+  .tabs-navigation {
+    display: flex;
+    background: $bg-light;
+    border-bottom: 2px solid $border-color;
+
+    .tab-btn {
+      flex: 1;
+      padding: 1.25rem 1.5rem;
+      background: transparent;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      color: $text-gray;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      position: relative;
+
+      i {
+        font-size: 1.2rem;
+      }
+
+      &:hover {
+        background: rgba($third-color, 0.1);
+        color: $third-color;
+      }
+
+      &.active {
+        color: $primary-color;
+        background: $white;
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: $secondary-color;
+        }
+      }
+
+      &.danger {
+        &:hover {
+          background: rgba($danger-red, 0.1);
+          color: $danger-red;
+        }
+
+        &.active {
+          color: $danger-red;
+
+          &::after {
+            background: $danger-red;
+          }
+        }
+      }
+    }
+  }
+
+  // Alerts
+  .alert {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 2rem 0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    animation: slideDown 0.3s ease;
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  .alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 2px solid $success-green;
+    border-left: 4px solid $success-green;
+  }
+
+  .alert-error {
+    background: #fee;
+    color: $error-red;
+    border: 2px solid $error-red;
+    border-left: 4px solid $error-red;
+  }
+
+  // Tab Content
+  .tab-content {
+    padding: 2.5rem;
+
+    .content-header {
+      margin-bottom: 2rem;
+
+      h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: $primary-color;
+        margin: 0 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        i {
+          font-size: 1.5rem;
+        }
+      }
+
+      p {
+        color: $text-gray;
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      &.danger {
+        h2 {
+          color: $danger-red;
+        }
+      }
+    }
+
+    // Forms
+    .profile-form {
+      .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+
+        label {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.95rem;
+          font-weight: 600;
+          color: $primary-color;
+          margin-bottom: 0.5rem;
+
+          i {
+            color: $secondary-color;
+          }
+
+          strong {
+            color: $danger-red;
+          }
+
+          .readonly-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: $text-gray;
+            background: $bg-light;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-left: auto;
+          }
+        }
+
+        .form-control {
+          width: 100%;
+          padding: 0.875rem 1rem;
+          font-size: 0.95rem;
+          font-family: $font-family;
+          color: $text-dark;
+          background-color: $white;
+          border: 2px solid $border-color;
+          border-radius: 10px;
+          transition: all 0.3s ease;
+          outline: none;
+
+          &::placeholder {
+            color: #b0b0b0;
+          }
+
+          &:focus {
+            border-color: $third-color;
+            box-shadow: 0 0 0 3px rgba(52, 137, 194, 0.1);
+          }
+
+          &:hover:not([readonly]) {
+            border-color: #c7c7c7;
+          }
+
+          &[readonly] {
+            background-color: #f9fafb;
+            color: $text-gray;
+            cursor: not-allowed;
+            border-color: #e5e7eb;
+          }
+        }
+
+        .info-text {
+          color: $text-gray;
+          font-size: 0.8rem;
+          margin-top: 0.25rem;
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+
+          i {
+            font-size: 0.75rem;
+          }
+        }
+
+        .error-text {
+          color: $error-red;
+          font-size: 0.85rem;
+          margin-top: 0.25rem;
+          display: block;
+        }
+      }
+
+      .submit-btn {
+        width: 100%;
+        padding: 1rem 2rem;
+        font-size: 1.05rem;
+        font-weight: 600;
+        font-family: $font-family;
+        color: $white;
+        background: linear-gradient(135deg, $secondary-color 0%, #d66820 100%);
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+
+        &:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(231, 122, 40, 0.3);
+        }
+
+        &:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    // Danger Zone
+    &.danger-zone {
+      .danger-action-card {
+        background: #fff5f5;
+        border: 2px solid $danger-red;
+        border-radius: 12px;
+        padding: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
+
+        .action-info {
+          flex: 1;
+
+          h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: $danger-red;
+            margin: 0 0 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+          }
+
+          p {
+            color: $text-gray;
+            margin: 0;
+            font-size: 0.95rem;
+          }
+        }
+
+        .danger-btn {
+          padding: 0.875rem 2rem;
+          font-size: 1rem;
+          font-weight: 600;
+          font-family: $font-family;
+          color: $white;
+          background: $danger-red;
+          border: none;
+          border-radius: 10px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          white-space: nowrap;
+
+          &:hover {
+            background: color.adjust($danger-red, $lightness: -10%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.3);
+          }
+        }
+      }
+    }
+  }
+
+  // Modal
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+    animation: fadeIn 0.3s ease;
+
+    .modal-content {
+      background: $white;
+      border-radius: 15px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: scaleIn 0.3s ease;
+
+      .modal-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 2px solid $border-color;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        h3 {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: $danger-red;
+          margin: 0;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .close-btn {
+          width: 35px;
+          height: 35px;
+          border-radius: 50%;
+          background: transparent;
+          border: none;
+          color: $text-gray;
+          font-size: 1.25rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &:hover {
+            background: $bg-light;
+            color: $danger-red;
+          }
+        }
+      }
+
+      .modal-body {
+        padding: 2rem;
+
+        .warning-box {
+          background: #fff3cd;
+          border: 2px solid $warning-orange;
+          border-left: 4px solid $warning-orange;
+          border-radius: 10px;
+          padding: 1rem;
+          margin-bottom: 1.5rem;
+          display: flex;
+          align-items: flex-start;
+          gap: 0.75rem;
+          color: #856404;
+
+          i {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+          }
+
+          strong {
+            font-weight: 700;
+          }
+        }
+
+        // Form elements inside modal
+        form {
+          .form-group {
+            margin-bottom: 1.5rem;
+
+            label {
+              display: block;
+              font-size: 0.95rem;
+              font-weight: 600;
+              color: $primary-color;
+              margin-bottom: 0.5rem;
+
+              i {
+                color: $secondary-color;
+                margin-right: 0.25rem;
+              }
+
+              strong {
+                color: $danger-red;
+                font-weight: 700;
+              }
+            }
+
+            .form-control {
+              width: 100%;
+              padding: 0.875rem 1rem;
+              font-size: 0.95rem;
+              font-family: $font-family;
+              color: $text-dark;
+              background-color: $white;
+              border: 2px solid $border-color;
+              border-radius: 10px;
+              transition: all 0.3s ease;
+              outline: none;
+              box-sizing: border-box;
+
+              &::placeholder {
+                color: #b0b0b0;
+              }
+
+              &:focus {
+                border-color: $third-color;
+                box-shadow: 0 0 0 3px rgba(52, 137, 194, 0.1);
+              }
+
+              &:hover {
+                border-color: #c7c7c7;
+              }
+            }
+
+            .error-text {
+              color: $error-red;
+              font-size: 0.85rem;
+              margin-top: 0.25rem;
+              display: block;
+            }
+          }
+        }
+
+        .modal-actions {
+          display: flex;
+          gap: 1rem;
+          margin-top: 1.5rem;
+
+          .cancel-btn {
+            flex: 1;
+            padding: 0.875rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: $font-family;
+            color: $text-gray;
+            background: $bg-light;
+            border: 2px solid $border-color;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &:hover {
+              background: color.adjust($bg-light, $lightness: -5%);
+              border-color: $text-gray;
+            }
+          }
+
+          .confirm-delete-btn {
+            flex: 1;
+            padding: 0.875rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: $font-family;
+            color: $white;
+            background: $danger-red;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+
+            &:hover:not(:disabled) {
+              background: color.adjust($danger-red, $lightness: -10%);
+              transform: translateY(-2px);
+              box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+            }
+
+            &:disabled {
+              opacity: 0.7;
+              cursor: not-allowed;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Spinner
+  .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: $white;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+// Responsive Styles
+@media (max-width: 992px) {
+  .profile-page {
+    padding: 1.5rem;
+    padding-top: 90px;
+
+    .profile-header {
+      flex-direction: column;
+      gap: 1.5rem;
+      text-align: center;
+
+      .header-content {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    .tabs-navigation {
+      .tab-btn {
+        span {
+          display: none;
+        }
+      }
+    }
+
+    .tab-content {
+      padding: 2rem 1.5rem;
+
+      &.danger-zone {
+        .danger-action-card {
+          flex-direction: column;
+          text-align: center;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-page {
+    padding: 1rem;
+    padding-top: 80px;
+
+    .profile-header {
+      padding: 2rem 1.5rem;
+
+      .header-content {
+        .user-avatar {
+          width: 60px;
+          height: 60px;
+          font-size: 2rem;
+        }
+
+        .user-info {
+          h1 {
+            font-size: 1.5rem;
+          }
+        }
+      }
+    }
+
+    .tab-content {
+      padding: 1.5rem 1rem;
+
+      .profile-form {
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-page {
+    .profile-header {
+      padding: 1.5rem 1rem;
+
+      .user-info {
+        h1 {
+          font-size: 1.25rem;
+        }
+      }
+
+      .logout-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    .tabs-navigation {
+      .tab-btn {
+        padding: 1rem 0.5rem;
+        font-size: 0.9rem;
+
+        i {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+}

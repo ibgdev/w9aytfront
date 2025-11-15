@@ -1,0 +1,329 @@
+<app-navbar></app-navbar>
+
+<div class="profile-page">
+  <div class="profile-container">
+    <!-- Header -->
+    <div class="profile-header">
+      <div class="header-content">
+        <div class="user-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="user-info">
+          <h1>{{ currentUser()?.name || 'User Profile' }}</h1>
+          <p class="user-email">{{ currentUser()?.email }}</p>
+          <p class="member-since">Member since {{ getMemberSince() }}</p>
+        </div>
+      </div>
+      <button class="logout-btn" (click)="onLogout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs-navigation">
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab() === 'profile'"
+        (click)="switchTab('profile')">
+        <i class="fas fa-user-circle"></i>
+        <span>Profile Info</span>
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab() === 'security'"
+        (click)="switchTab('security')">
+        <i class="fas fa-lock"></i>
+        <span>Security</span>
+      </button>
+      <button 
+        class="tab-btn danger" 
+        [class.active]="activeTab() === 'danger'"
+        (click)="switchTab('danger')">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>Danger Zone</span>
+      </button>
+    </div>
+
+    <!-- Success Message -->
+    @if (successMessage()) {
+      <div class="alert alert-success">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>{{ successMessage() }}</span>
+      </div>
+    }
+
+    <!-- Error Message -->
+    @if (errorMessage()) {
+      <div class="alert alert-error">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+          <path d="M12 8V12M12 16H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <!-- Profile Tab Content -->
+    @if (activeTab() === 'profile') {
+      <div class="tab-content">
+        <div class="content-header">
+          <h2><i class="fas fa-user-edit"></i> Edit Profile Information</h2>
+          <p>Update your personal information and contact details</p>
+        </div>
+
+        <form [formGroup]="profileForm" (ngSubmit)="onUpdateProfile()" class="profile-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">
+                <i class="fas fa-user"></i> Full Name
+              </label>
+              <input 
+                type="text" 
+                id="name" 
+                class="form-control" 
+                formControlName="name"
+                placeholder="Enter your full name" />
+              @if (profileSubmitted() && profileControls.name.errors?.['required']) {
+                <small class="error-text">Name is required</small>
+              }
+              @if (profileSubmitted() && profileControls.name.errors?.['minlength']) {
+                <small class="error-text">Name must be at least 3 characters</small>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="email">
+                <i class="fas fa-envelope"></i> Email Address
+                <span class="readonly-badge">Read Only</span>
+              </label>
+              <input 
+                type="email" 
+                id="email" 
+                class="form-control" 
+                formControlName="email"
+                placeholder="your@email.com"
+                readonly />
+              <small class="info-text">
+                <i class="fas fa-info-circle"></i> Email cannot be changed
+              </small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="phone">
+                <i class="fas fa-phone"></i> Phone Number
+              </label>
+              <input 
+                type="tel" 
+                id="phone" 
+                class="form-control" 
+                formControlName="phone"
+                placeholder="+1 234 567 8900" />
+              @if (profileSubmitted() && profileControls.phone.errors?.['required']) {
+                <small class="error-text">Phone is required</small>
+              }
+              @if (profileSubmitted() && profileControls.phone.errors?.['minlength']) {
+                <small class="error-text">Phone must be at least 8 digits</small>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="address">
+                <i class="fas fa-map-marker-alt"></i> Address
+              </label>
+              <input 
+                type="text" 
+                id="address" 
+                class="form-control" 
+                formControlName="address"
+                placeholder="Your address" />
+              @if (profileSubmitted() && profileControls.address.errors?.['required']) {
+                <small class="error-text">Address is required</small>
+              }
+              @if (profileSubmitted() && profileControls.address.errors?.['minlength']) {
+                <small class="error-text">Address must be at least 5 characters</small>
+              }
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" [disabled]="isLoading()">
+            @if (isLoading()) {
+              <span class="spinner"></span>
+              Updating...
+            } @else {
+              <i class="fas fa-save"></i> Update Profile
+            }
+          </button>
+        </form>
+      </div>
+    }
+
+    <!-- Security Tab Content -->
+    @if (activeTab() === 'security') {
+      <div class="tab-content">
+        <div class="content-header">
+          <h2><i class="fas fa-shield-alt"></i> Change Password</h2>
+          <p>Update your password to keep your account secure</p>
+        </div>
+
+        <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="profile-form">
+          <div class="form-group">
+            <label for="currentPassword">
+              <i class="fas fa-lock"></i> Current Password
+            </label>
+            <input 
+              type="password" 
+              id="currentPassword" 
+              class="form-control" 
+              formControlName="currentPassword"
+              placeholder="Enter your current password" />
+            @if (passwordSubmitted() && passwordControls.currentPassword.errors?.['required']) {
+              <small class="error-text">Current password is required</small>
+            }
+            @if (passwordSubmitted() && passwordControls.currentPassword.errors?.['minlength']) {
+              <small class="error-text">Password must be at least 6 characters</small>
+            }
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="newPassword">
+                <i class="fas fa-key"></i> New Password
+              </label>
+              <input 
+                type="password" 
+                id="newPassword" 
+                class="form-control" 
+                formControlName="newPassword"
+                placeholder="Enter new password" />
+              @if (passwordSubmitted() && passwordControls.newPassword.errors?.['required']) {
+                <small class="error-text">New password is required</small>
+              }
+              @if (passwordSubmitted() && passwordControls.newPassword.errors?.['minlength']) {
+                <small class="error-text">Password must be at least 6 characters</small>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword">
+                <i class="fas fa-check-circle"></i> Confirm New Password
+              </label>
+              <input 
+                type="password" 
+                id="confirmPassword" 
+                class="form-control" 
+                formControlName="confirmPassword"
+                placeholder="Confirm new password" />
+              @if (passwordSubmitted() && passwordControls.confirmPassword.errors?.['required']) {
+                <small class="error-text">Please confirm your password</small>
+              }
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" [disabled]="isLoading()">
+            @if (isLoading()) {
+              <span class="spinner"></span>
+              Changing...
+            } @else {
+              <i class="fas fa-shield-alt"></i> Change Password
+            }
+          </button>
+        </form>
+      </div>
+    }
+
+    <!-- Danger Zone Tab Content -->
+    @if (activeTab() === 'danger') {
+      <div class="tab-content danger-zone">
+        <div class="content-header danger">
+          <h2><i class="fas fa-exclamation-triangle"></i> Danger Zone</h2>
+          <p>Permanent actions that cannot be undone</p>
+        </div>
+
+        <div class="danger-action-card">
+          <div class="action-info">
+            <h3><i class="fas fa-trash-alt"></i> Delete Account</h3>
+            <p>Once you delete your account, there is no going back. Please be certain.</p>
+          </div>
+          <button class="danger-btn" (click)="openDeleteModal()">
+            <i class="fas fa-trash"></i> Delete Account
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Delete Account Modal -->
+  @if (showDeleteModal()) {
+    <div class="modal-overlay" (click)="closeDeleteModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3><i class="fas fa-exclamation-circle"></i> Delete Account</h3>
+          <button class="close-btn" (click)="closeDeleteModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="warning-box">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+              <strong>Warning:</strong> This action cannot be undone. This will permanently delete your account and remove all your data from our servers.
+            </div>
+          </div>
+
+          <form [formGroup]="deleteForm" (ngSubmit)="onDeleteAccount()">
+            <div class="form-group">
+              <label for="password">
+                <i class="fas fa-lock"></i> Enter Your Password
+              </label>
+              <input 
+                type="password" 
+                id="password" 
+                class="form-control" 
+                formControlName="password"
+                placeholder="Enter your password to confirm" />
+              @if (deleteSubmitted() && deleteControls.password.errors?.['required']) {
+                <small class="error-text">Password is required</small>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="confirmation">
+                Type <strong>DELETE</strong> to confirm
+              </label>
+              <input 
+                type="text" 
+                id="confirmation" 
+                class="form-control" 
+                formControlName="confirmation"
+                placeholder="Type DELETE" />
+              @if (deleteSubmitted() && deleteControls.confirmation.errors?.['required']) {
+                <small class="error-text">Please type DELETE to confirm</small>
+              }
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" class="cancel-btn" (click)="closeDeleteModal()">
+                Cancel
+              </button>
+              <button type="submit" class="confirm-delete-btn" [disabled]="isLoading()">
+                @if (isLoading()) {
+                  <span class="spinner"></span>
+                  Deleting...
+                } @else {
+                  <i class="fas fa-trash"></i> Delete My Account
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<app-footer></app-footer>

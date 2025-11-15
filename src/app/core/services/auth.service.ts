@@ -21,7 +21,8 @@ export interface User {
   role: string;
   status: string;
   verified: number;
-  created_at: string;
+  created_at?: string;
+  createdAt?: string; // Support both naming conventions
 }
 
 export interface SignUpResponse {
@@ -29,6 +30,30 @@ export interface SignUpResponse {
   message: string;
   user?: User;
   errors?: Array<{ field: string; message: string }>;
+}
+
+export interface ForgotPasswordResponse{
+  message: string
+}
+
+export interface VerifyResetCodeRequest {
+  email: string;
+  code: string;
+}
+
+export interface VerifyResetCodeResponse {
+  message: string;
+  success: boolean;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  newPassword: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
+  success: boolean;
 }
 
 export interface LoginRequest {
@@ -62,6 +87,24 @@ export class AuthService {
       .pipe(catchError(this.handleError));
   }
 
+  forgotPassword(email: string): Observable<ForgotPasswordResponse>{
+    return this.http
+    .post<ForgotPasswordResponse>(`${this.API_URL}/forgot-password`, { email })
+    .pipe(catchError(this.handleError));
+  }
+
+  verifyResetCode(data: VerifyResetCodeRequest): Observable<VerifyResetCodeResponse> {
+    return this.http
+      .post<VerifyResetCodeResponse>(`${this.API_URL}/verify-reset-code`, data)
+      .pipe(catchError(this.handleError));
+  }
+
+  resetPassword(data: ResetPasswordRequest): Observable<ResetPasswordResponse> {
+    return this.http
+      .post<ResetPasswordResponse>(`${this.API_URL}/reset-password`, data)
+      .pipe(catchError(this.handleError));
+  }
+
   saveSession(token: string, user: User): void {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
@@ -88,6 +131,8 @@ export class AuthService {
     }
     return !!localStorage.getItem('token');
   }
+
+  
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An error occurred';
