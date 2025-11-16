@@ -1,0 +1,48 @@
+<div class="verify-email-page">
+  <div class="verify-container">
+    <div class="verify-card">
+      <!-- Loading State -->
+      @if (isLoading()) {
+        <div class="loading-section">
+          <div class="spinner-large"></div>
+          <h2>Verifying your email...</h2>
+          <p>Please wait while we verify your account</p>
+        </div>
+      }
+
+      <!-- Success State -->
+      @if (!isLoading() && isSuccess()) {
+        <div class="success-section">
+          <div class="success-icon">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="11" fill="#10b981" opacity="0.2"/>
+              <path d="M7 12L10.5 15.5L17 9" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h2>Email Verified Successfully!</h2>
+          <p class="success-message">{{ successMessage() }}</p>
+          <p class="redirect-info">Redirecting to login page...</p>
+          <a routerLink="/login" class="login-link">Go to Login Now</a>
+        </div>
+      }
+
+      <!-- Error State -->
+      @if (!isLoading() && errorMessage() && !isSuccess()) {
+        <div class="error-section">
+          <div class="error-icon">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="11" fill="#ef4444" opacity="0.2"/>
+              <path d="M15 9L9 15M9 9L15 15" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h2>Verification Failed</h2>
+          <p class="error-message">{{ errorMessage() }}</p>
+          <div class="action-buttons">
+            <a routerLink="/login" class="btn-secondary">Go to Login</a>
+            <a routerLink="/signup" class="btn-primary">Create New Account</a>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -15,6 +15,14 @@ export class Login implements OnInit {
     if (this.auth.isLoggedIn()) {
       this.router.navigateByUrl('/home')
     }
+      const params = new URLSearchParams(window.location.search);
+  if (params.get('verified') === 'true') {
+    if (params.get('already') === 'true') {
+      this.showMessage('Your account is already verified. Please login.');
+    } else {
+      this.showMessage('Email verified successfully! You can now login.');
+    }
+  }
   }
   
   private fb = inject(FormBuilder);
@@ -29,9 +37,21 @@ export class Login implements OnInit {
   submitted = signal(false);
   loading = signal(false);
   errorMessage = signal('');
+  successMessage = signal('');
+  showResendButton = signal(false);
+  resendEmail = signal('');
+  resendLoading = signal(false);
+  resendSuccess = signal('');
 
   get f() {
     return this.loginForm.controls;
+  }
+
+  private showMessage(message: string) {
+    this.successMessage.set(message);
+    setTimeout(() => {
+      this.successMessage.set('');
+    }, 5000);
   }
 
   onSubmit() {
@@ -58,7 +78,36 @@ export class Login implements OnInit {
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorMessage.set('Invalid credentials');
+        
+        // Check if it's a verification error (403)
+        if (err.message && err.message.includes('verify your email')) {
+          this.errorMessage.set(err.message);
+          this.showResendButton.set(true);
+          this.resendEmail.set(email!);
+        } else {
+          this.errorMessage.set(err.message || 'Invalid credentials');
+          this.showResendButton.set(false);
+        }
+      }
+    });
+  }
+
+  resendVerificationEmail() {
+    this.resendLoading.set(true);
+    this.resendSuccess.set('');
+    this.errorMessage.set('');
+
+    this.auth.resendVerification(this.resendEmail()).subscribe({
+      next: (res) => {
+        this.resendLoading.set(false);
+        if (res.success) {
+          this.resendSuccess.set(res.message);
+          this.showResendButton.set(false);
+        }
+      },
+      error: (err) => {
+        this.resendLoading.set(false);
+        this.errorMessage.set(err.message || 'Failed to resend verification email');
       }
     });
   }

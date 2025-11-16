@@ -1,0 +1,235 @@
+// Colors
+$primary-color: #253e6b;
+$secondary-color: #e77a28;
+$third-color: #3489c2;
+$white: #ffffff;
+$success-color: #10b981;
+$error-color: #ef4444;
+$bg-light: #f8f9fa;
+
+// Font
+$font-family: 'Poppins', sans-serif;
+
+.verify-email-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #c5d9f5 0%, #a8c5ed 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-family;
+  padding: 2rem;
+}
+
+.verify-container {
+  width: 100%;
+  max-width: 600px;
+}
+
+.verify-card {
+  background: $white;
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+
+// Loading Section
+.loading-section {
+  padding: 2rem;
+
+  .spinner-large {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba($third-color, 0.2);
+    border-top-color: $third-color;
+    border-radius: 50%;
+    margin: 0 auto 2rem;
+    animation: spin 0.8s linear infinite;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+    color: $primary-color;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  p {
+    color: #666;
+    font-size: 1rem;
+  }
+}
+
+// Success Section
+.success-section {
+  padding: 2rem;
+
+  .success-icon {
+    margin: 0 auto 1.5rem;
+    animation: scaleIn 0.5s ease;
+  }
+
+  h2 {
+    font-size: 2rem;
+    color: $success-color;
+    margin-bottom: 1rem;
+    font-weight: 700;
+  }
+
+  .success-message {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  .redirect-info {
+    color: #999;
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    font-style: italic;
+  }
+
+  .login-link {
+    display: inline-block;
+    padding: 0.875rem 2.5rem;
+    background-color: $secondary-color;
+    color: $white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba($secondary-color, 0.3);
+
+    &:hover {
+      background-color: darken($secondary-color, 10%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba($secondary-color, 0.4);
+    }
+  }
+}
+
+// Error Section
+.error-section {
+  padding: 2rem;
+
+  .error-icon {
+    margin: 0 auto 1.5rem;
+    animation: shake 0.5s ease;
+  }
+
+  h2 {
+    font-size: 2rem;
+    color: $error-color;
+    margin-bottom: 1rem;
+    font-weight: 700;
+  }
+
+  .error-message {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: #fee;
+    border-radius: 8px;
+    border: 1px solid #fcc;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    .btn-secondary,
+    .btn-primary {
+      padding: 0.875rem 2rem;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    .btn-secondary {
+      background-color: $white;
+      color: $primary-color;
+      border: 2px solid $primary-color;
+
+      &:hover {
+        background-color: $primary-color;
+        color: $white;
+        transform: translateY(-2px);
+      }
+    }
+
+    .btn-primary {
+      background-color: $secondary-color;
+      color: $white;
+      box-shadow: 0 4px 12px rgba($secondary-color, 0.3);
+
+      &:hover {
+        background-color: darken($secondary-color, 10%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba($secondary-color, 0.4);
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  75% {
+    transform: translateX(10px);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .verify-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .success-section,
+  .error-section,
+  .loading-section {
+    padding: 1rem;
+
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .action-buttons {
+    flex-direction: column;
+
+    .btn-secondary,
+    .btn-primary {
+      width: 100%;
+    }
+  }
+}

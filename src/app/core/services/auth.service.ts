@@ -68,6 +68,20 @@ export interface LoginResponse {
   user?: User;
 }
 
+export interface ResendVerificationRequest {
+  email: string;
+}
+
+export interface ResendVerificationResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface VerifyEmailResponse {
+  success: boolean;
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -102,6 +116,18 @@ export class AuthService {
   resetPassword(data: ResetPasswordRequest): Observable<ResetPasswordResponse> {
     return this.http
       .post<ResetPasswordResponse>(`${this.API_URL}/reset-password`, data)
+      .pipe(catchError(this.handleError));
+  }
+
+  resendVerification(email: string): Observable<ResendVerificationResponse> {
+    return this.http
+      .post<ResendVerificationResponse>(`${this.API_URL}/resend-verification`, { email })
+      .pipe(catchError(this.handleError));
+  }
+
+  verifyEmail(token: string, email: string): Observable<VerifyEmailResponse> {
+    return this.http
+      .get<VerifyEmailResponse>(`${this.API_URL}/verify-email?token=${token}&email=${email}`)
       .pipe(catchError(this.handleError));
   }
 

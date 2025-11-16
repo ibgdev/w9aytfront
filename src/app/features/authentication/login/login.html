@@ -61,9 +61,23 @@
             <a routerLink="/forgot-password" class="forgot-link">Forgot password?</a>
           </div>
 
-          @if (errorMessage()) {
+          @if (successMessage()) {
+          <div class="alert alert-success">{{ successMessage() }}</div>
+          }
 
+          @if (errorMessage()) {
           <div class="alert alert-danger">{{ errorMessage() }}</div>
+          }
+
+          @if (resendSuccess()) {
+          <div class="alert alert-success">{{ resendSuccess() }}</div>
+          }
+
+          @if (showResendButton()) {
+          <button type="button" class="resend-btn" (click)="resendVerificationEmail()" [disabled]="resendLoading()">
+            <i class="fas fa-envelope"></i>
+            {{ resendLoading() ? 'Sending...' : 'Resend Verification Email' }}
+          </button>
           }
 
           <button type="submit" class="login-btn" [disabled]="loading()">
