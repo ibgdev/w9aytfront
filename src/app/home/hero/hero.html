@@ -1,27 +1,56 @@
-<div class="hero-container">
-  <div class="hero-content">
-    <!-- Left Side - Text Content -->
-    <div class="hero-text">
-      <h1 class="hero-title">
-        <span class="title-line">Fast Deliveries,</span>
-        <span class="title-line highlight">Simple Solutions.</span>
-      </h1>
-      <div class="texte">
-        <p class="hero-description">
-          Track, manage, and deliver with confidence using
-          <span class="brand-highlight">W9aytDelivery,</span>
-        </p>
-        <p class="hero-tagline">the smart way to move what matters.</p>
-      </div>
-      <div class="hero-buttons">
-        <button class="btn-primary" routerLink="/get-started">Get Started</button>
-        <button class="btn-secondary" routerLink="/how-it-works">How It Works</button>
-      </div>
-    </div>
+@if (isloggedIn()) {
+  <!-- Version connecté -->
+  <div class="hero-container">
+    <div class="hero-content">
+      <!-- Left Side - Text Content -->
+      <div class="hero-text">
+        <h1 class="hero-title">
+          <span class="title-line">Hi {{ currentUser?.name || 'User' }}👋,</span>
+          <span class="title-line highlight">here's your delivery</span>
+          <span class="title-line highlight">summary for today.</span>
+        </h1>
+        <div class="texte">
+          <p class="hero-description">
+            Your fast, reliable, creative delivery solutions.
+          </p>
+        </div>
 
-    <!-- Right Side - Image/Illustration -->
-    <div class="hero-image">
-      <img src="/illu_home.png" alt="w9ayt delivery illustration" draggable="false">
+       
+      </div>
+
+      <!-- Right Side - Image/Illustration -->
+      <div class="hero-image">
+<img src="/illu_home.png" alt="w9ayt delivery illustration" draggable="false">
+      </div>
     </div>
   </div>
-</div>
+} @else {
+  <!-- Version non connecté -->
+  <div class="hero-container">
+    <div class="hero-content">
+      <!-- Left Side - Text Content -->
+      <div class="hero-text">
+        <h1 class="hero-title">
+          <span class="title-line">Fast Deliveries,</span>
+          <span class="title-line highlight">Simple Solutions.</span>
+        </h1>
+        <div class="texte">
+          <p class="hero-description">
+            Track, manage, and deliver with confidence using
+            <span class="brand-highlight">W9aytDelivery,</span>
+          </p>
+          <p class="hero-tagline">the smart way to move what matters.</p>
+        </div>
+        <div class="hero-buttons">
+          <button class="btn-primary" routerLink="/get-started">Get Started</button>
+          <button class="btn-secondary" routerLink="/how-it-works">How It Works</button>
+        </div>
+      </div>
+
+      <!-- Right Side - Image/Illustration -->
+      <div class="hero-image">
+        <img src="/illu_home.png" alt="w9ayt delivery illustration" draggable="false">
+      </div>
+    </div>
+  </div>
+}
