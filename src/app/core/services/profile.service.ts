@@ -17,7 +17,7 @@ export interface UpdateProfileResponse {
 }
 export interface VerifyPasswordRequest {
   email: string;
-  curentPassword: string;
+  currentPassword: string;
 }
 export interface VerifyPasswordResponse {
   success: boolean;

@@ -157,7 +157,7 @@ export class Profile implements OnInit {
     // First, verify the current password
     this.profile.verifyPassword({
       email: this.currentUser()?.email || '',
-      curentPassword: this.passwordForm.value.currentPassword || ''
+      currentPassword: this.passwordForm.value.currentPassword || ''
     }).subscribe({
       next: (verifyResponse) => {
         // Current password is correct, proceed with password reset
