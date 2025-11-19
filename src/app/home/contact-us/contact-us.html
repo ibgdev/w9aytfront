@@ -4,17 +4,39 @@
       <h2 class="form-title">Contact Us</h2>
       <div class="title-underline"></div>
 
-      <form class="contact-form">
+      <form class="contact-form" [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+        <!-- Success Message -->
+        @if (successMessage()) {
+        <div class="alert alert-success">
+          <i class="fas fa-check-circle"></i>
+          {{ successMessage() }}
+        </div>
+        }
+
+        <!-- Error Message -->
+        @if (errorMessage()) {
+        <div class="alert alert-error">
+          <i class="fas fa-exclamation-circle"></i>
+          {{ errorMessage() }}
+        </div>
+        }
+
         <!-- Full Name Field -->
         <div class="form-group">
-          <label for="fullName">Full name</label>
+          <label for="fullname">Full name</label>
           <input 
             type="text" 
-            id="fullName" 
-            class="form-control" 
+            id="fullname" 
+            class="form-control"
+            formControlName="fullname"
             placeholder="Your full name"
-            required
           >
+          @if (submitted() && f.fullname.errors?.['required']) {
+          <small class="error-text">Full name is required</small>
+          }
+          @if (submitted() && f.fullname.errors?.['minlength']) {
+          <small class="error-text">Full name must be at least 3 characters</small>
+          }
         </div>
 
         <!-- Email Field -->
@@ -23,26 +45,44 @@
           <input 
             type="email" 
             id="email" 
-            class="form-control" 
+            class="form-control"
+            formControlName="email"
             placeholder="youremail@domain.com"
-            required
           >
+          @if (submitted() && f.email.errors?.['required']) {
+          <small class="error-text">Email is required</small>
+          }
+          @if (submitted() && f.email.errors?.['email']) {
+          <small class="error-text">Please enter a valid email</small>
+          }
         </div>
 
         <!-- Tell Us Field -->
         <div class="form-group">
-          <label for="message">Tell us</label>
+          <label for="tell">Tell us</label>
           <textarea 
-            id="message" 
+            id="tell" 
             class="form-control" 
             rows="5"
+            formControlName="tell"
             placeholder="write what ever you want and if there are any problems or feedbacks"
-            required
           ></textarea>
+          @if (submitted() && f.tell.errors?.['required']) {
+          <small class="error-text">Message is required</small>
+          }
+          @if (submitted() && f.tell.errors?.['minlength']) {
+          <small class="error-text">Message must be at least 10 characters</small>
+          }
         </div>
 
         <!-- Submit Button -->
-        <button type="submit" class="submit-btn">Send</button>
+        <button type="submit" class="submit-btn" [disabled]="isLoading()">
+          @if (isLoading()) {
+            <i class="fas fa-spinner fa-spin"></i> Sending...
+          } @else {
+            <i class="fas fa-paper-plane"></i> Send
+          }
+        </button>
       </form>
     </div>
   </div>

@@ -50,7 +50,48 @@ $font-family: 'Poppins', sans-serif;
   }
 
   // Form Styles
+  // Contact Form
   .contact-form {
+    width: 100%;
+
+    .alert {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.95rem;
+      animation: slideDown 0.3s ease;
+
+      i {
+        font-size: 1.2rem;
+      }
+
+      &.alert-success {
+        background-color: #d1fae5;
+        color: #065f46;
+        border: 1px solid #10b981;
+      }
+
+      &.alert-error {
+        background-color: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #ef4444;
+      }
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .form-group {
       margin-bottom: 1.5rem;
 
@@ -93,6 +134,13 @@ $font-family: 'Poppins', sans-serif;
         resize: vertical;
         min-height: 120px;
       }
+
+      .error-text {
+        display: block;
+        color: #ef4444;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+      }
     }
 
     // Submit Button
@@ -109,15 +157,28 @@ $font-family: 'Poppins', sans-serif;
       cursor: pointer;
       transition: all 0.3s ease;
       margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
 
-      &:hover {
+      i {
+        font-size: 1rem;
+      }
+
+      &:hover:not(:disabled) {
         background-color: #1a2d4d;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(37, 62, 107, 0.3);
       }
 
-      &:active {
+      &:active:not(:disabled) {
         transform: translateY(0);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
       }
     }
   }
