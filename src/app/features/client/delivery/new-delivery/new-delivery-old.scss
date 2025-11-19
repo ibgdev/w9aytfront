@@ -1,0 +1,114 @@
+/* src/app/features/new-delivery/new-delivery.component.scss */
+.new-delivery-container {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem;
+  align-items: flex-start;
+  .form-column {
+    flex: 1 1 520px;
+  }
+  .map-column {
+    flex: 0 0 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+.address-form {
+  margin-top: 12px;
+
+  input[type="text"] {
+    width: 100%;
+    padding: 8px 10px;
+    box-sizing: border-box;
+  }
+
+  .address-hint {
+    margin-top: 6px;
+    font-size: 0.875rem;
+  }
+
+  .hint {
+    display: inline-block;
+    padding: 4px 6px;
+    border-radius: 4px;
+  }
+
+  .hint.info {
+    color: #333;
+  }
+
+  .hint.success {
+    color: #155724;
+    background: rgba(40,167,69,0.06);
+  }
+
+  .hint.error {
+    color: #721c24;
+    background: rgba(220,53,69,0.06);
+  }
+}
+
+.map {
+  width: 100%;
+  height: 420px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.price-box {
+  margin-top: 8px;
+  background: #12345a;
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 20px;
+  text-align: center;
+  width: 160px;
+}
+
+.address-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-weight: 600;
+  }
+
+  input {
+    padding: 0.6rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 100%;
+  }
+}
+
+.delivery-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.row.two-cols {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.row.two-cols .col {
+  flex: 1;
+}
+
+.actions {
+  margin-top: 12px;
+}
+
+.btn-primary {
+  background: #ff8a00;
+  border: none;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+}

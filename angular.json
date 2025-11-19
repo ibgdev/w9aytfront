@@ -25,9 +25,17 @@
                 "glob": "**/*",
                 "input": "public"
               }
+              ,
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets"
+              }
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "node_modules/leaflet/dist/leaflet.css"
+
             ]
           },
           "configurations": {
@@ -78,7 +86,9 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+                "src/assets"
+
             ],
             "styles": [
               "src/styles.scss"

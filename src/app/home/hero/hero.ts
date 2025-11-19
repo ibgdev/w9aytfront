@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-hero',
-  imports: [RouterLink, RouterLinkActive, CommonModule],
+  imports: [CommonModule],
   templateUrl: './hero.html',
   styleUrl: './hero.scss',
 })

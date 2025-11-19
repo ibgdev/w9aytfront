@@ -12,7 +12,7 @@ import { KpiComponent } from '../kpi/kpi';
 
 @Component({
   selector: 'app-home',
-  imports: [Navbar, Footer, Hero, Solutions, HowItWorks, ContactUs, RouterLink, RouterLinkActive, CommonModule, KpiComponent],
+  imports: [Navbar, Footer, Hero, Solutions, HowItWorks, ContactUs,CommonModule, KpiComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
