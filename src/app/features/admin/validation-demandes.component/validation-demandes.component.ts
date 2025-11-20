@@ -1,14 +1,16 @@
-import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService, User } from '../../../core/services/user.service';
+import { CompanyService, Company } from '../../../core/services/company.service';
 import { SidebarComponent } from '../sidebar/sidebar.component/sidebar.component';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-validation-demandes',
   standalone: true,
-  imports: [CommonModule, SidebarComponent],
+  imports: [CommonModule, FormsModule, SidebarComponent],
   templateUrl: './validation-demandes.component.html',
   styleUrls: ['./validation-demandes.component.scss']
 })
@@ -16,11 +18,19 @@ export class ValidationDemandesComponent implements OnInit {
   
   users: User[] = [];
   isLoading = false;
+  showCompanyDetails = false;
+  selectedCompany: Company | null = null;
+  
+  // Alert system
+  alertMessage = signal('');
+  alertType = signal<'success' | 'error' | 'warning' | ''>('');
+  
   private auth = inject(AuthService);
   private router = inject(Router);
 
   constructor(
     private userService: UserService,
+    private companyService: CompanyService,
     private cdr: ChangeDetectorRef // ✅ Ajouté
   ) {}
 
@@ -47,7 +57,8 @@ export class ValidationDemandesComponent implements OnInit {
     
     this.userService.getAllUsers().subscribe({
       next: (users) => {
-        this.users = users;
+        // Filter to show only suspended users
+        this.users = users.filter(user => user.status === 'suspended');
         this.isLoading = false;
         this.cdr.detectChanges(); // ✅ Force change detection
       },
@@ -59,49 +70,84 @@ export class ValidationDemandesComponent implements OnInit {
     });
   }
 
-  // Bouton Approve - change le status en "active"
+  // Approve user - change status to "active"
   approveUser(user: User): void {
     if (!user.id) return;
     
-    if (confirm(`Activer l'utilisateur ${user.name} ?`)) {
-      this.userService.updateUser(user.id, { status: 'active' }).subscribe({
-        next: () => {
-          user.status = 'active';
-          this.cdr.detectChanges(); // ✅ Force change detection
-          alert('Utilisateur activé !');
-        },
-        error: (error) => {
-          alert('Erreur !');
-          console.error(error);
-          this.cdr.detectChanges(); // ✅ Force change detection
-        }
-      });
-    }
+    this.userService.updateUser(user.id, { status: 'active' }).subscribe({
+      next: () => {
+        this.showAlert('User approved successfully', 'success');
+        this.loadUsers();
+      },
+      error: (error) => {
+        console.error(error);
+        this.showAlert('Error approving user', 'error');
+      }
+    });
   }
 
-  // Bouton Reject - change le status en "banned"  
+  // Reject user - change status to "banned"  
   rejectUser(user: User): void {
     if (!user.id) return;
     
-    if (confirm(`Bannir l'utilisateur ${user.name} ?`)) {
-      this.userService.updateUser(user.id, { status: 'banned' }).subscribe({
-        next: () => {
-          user.status = 'banned';
-          this.cdr.detectChanges(); // ✅ Force change detection
-          alert('Utilisateur banni !');
-        },
-        error: (error) => {
-          alert('Erreur !');
-          console.error(error);
-          this.cdr.detectChanges(); // ✅ Force change detection
-        }
-      });
-    }
+    this.userService.updateUser(user.id, { status: 'banned' }).subscribe({
+      next: () => {
+        this.showAlert('User rejected successfully', 'success');
+        this.loadUsers();
+      },
+      error: (error) => {
+        console.error(error);
+        this.showAlert('Error rejecting user', 'error');
+      }
+    });
   }
 
   getStatusText(status: string | undefined): string {
-    if (status === 'active') return 'Actif';
-    if (status === 'banned') return 'Banni';
-    return 'En attente';
+    if (status === 'active') return 'Active';
+    if (status === 'banned') return 'Banned';
+    if (status === 'suspended') return 'Suspended';
+    return 'Pending';
+  }
+
+  // View company details
+  viewCompanyDetails(user: User): void {
+    if (!user.id) return;
+    
+    // Fetch all companies and find the one associated with this user
+    this.companyService.getAllCompanies().subscribe({
+      next: (companies) => {
+        const company = companies.find(c => c.user_id === user.id);
+        if (company) {
+          this.selectedCompany = company;
+          this.showCompanyDetails = true;
+          this.cdr.detectChanges();
+        } else {
+          alert('No company found for this user');
+        }
+      },
+      error: (error) => {
+        console.error('Error loading company:', error);
+        alert('Error loading company details');
+      }
+    });
+  }
+
+  // Close company details modal
+  closeCompanyDetails(): void {
+    this.showCompanyDetails = false;
+    this.selectedCompany = null;
+    this.cdr.detectChanges();
+  }
+
+  // Show alert message
+  showAlert(message: string, type: 'success' | 'error' | 'warning'): void {
+    this.alertMessage.set(message);
+    this.alertType.set(type);
+    this.cdr.detectChanges();
+    setTimeout(() => {
+      this.alertMessage.set('');
+      this.alertType.set('');
+      this.cdr.detectChanges();
+    }, 5000);
   }
 }

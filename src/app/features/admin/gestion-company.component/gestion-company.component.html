@@ -3,53 +3,78 @@
 
   <div class="main-content">
 
+    <!-- Alert Container -->
+    @if (alertMessage()) {
+      <div class="alert-container" [ngClass]="'alert-' + alertType()">
+        <i class="fas" [ngClass]="{
+          'fa-check-circle': alertType() === 'success',
+          'fa-exclamation-circle': alertType() === 'error',
+          'fa-exclamation-triangle': alertType() === 'warning'
+        }"></i>
+        <span>{{ alertMessage() }}</span>
+      </div>
+    }
+
     <!-- Header -->
     <div class="header">
       <div class="header-left">
-        <span class="icon">🏢</span>
+        <i class="fas fa-building icon"></i>
         <div>
-          <h1>Gestion des Sociétés</h1>
-          <p>Administration des entreprises</p>
+          <h1>Company Management</h1>
+          <p>Business administration</p>
         </div>
       </div>
     </div>
 
-    <!-- Statistiques -->
+    <!-- Statistics -->
     <div class="stats-grid">
       <div class="stat-card blue">
-        <div class="stat-icon">🏢</div>
+        <div class="stat-icon">
+          <i class="fas fa-building"></i>
+        </div>
         <div class="stat-info">
-          <h3>Total Sociétés</h3>
+          <h3>Total Companies</h3>
           <p class="stat-number">{{ totalCompanies }}</p>
-          <span class="stat-subtitle">Toutes catégories</span>
+          <span class="stat-subtitle">All companies</span>
         </div>
       </div>
 
       <div class="stat-card green">
-        <div class="stat-icon">✅</div>
+        <div class="stat-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
         <div class="stat-info">
-          <h3>Actives</h3>
+          <h3>Active</h3>
           <p class="stat-number">{{ companiesActives }}</p>
-          <span class="stat-subtitle">En activité</span>
+          <span class="stat-subtitle">Active users</span>
         </div>
       </div>
 
       <div class="stat-card orange">
-        <div class="stat-icon">⏸️</div>
+        <div class="stat-icon">
+          <i class="fas fa-pause-circle"></i>
+        </div>
         <div class="stat-info">
-          <h3>Suspendues</h3>
+          <h3>Suspended</h3>
           <p class="stat-number">{{ companiesSuspendues }}</p>
-          <span class="stat-subtitle">En attente</span>
+          <span class="stat-subtitle">Suspended users</span>
         </div>
       </div>
+    </div>
 
-      <div class="stat-card purple">
-        <div class="stat-icon">🔍</div>
-        <div class="stat-info">
-          <h3>Vérifiées</h3>
-          <p class="stat-number">{{ companiesVerifiees }}</p>
-          <span class="stat-subtitle">Documents validés</span>
-        </div>
+    <!-- Search Bar -->
+    <div class="search-section">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (input)="filterCompanies()"
+          placeholder="Search by company name, tax ID, or email..."
+          class="search-input">
+        <button *ngIf="searchTerm" (click)="searchTerm = ''; filterCompanies()" class="clear-search">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
     </div>
 
@@ -59,19 +84,32 @@
         <thead>
           <tr>
             <th>ID</th>
-            <th>Nom de la Société</th>
-            <th>Matricule Fiscal</th>
-            <th>Statut Légal</th>
-            <th>Date de Création</th>
+            <th>Company Name</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Tax ID</th>
+            <th>Legal Status</th>
+            <th>Creation Date</th>
             <th>Actions</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr *ngFor="let company of companies">
+          <tr *ngFor="let company of filteredCompanies">
 
             <td>{{ company.id }}</td>
             <td><strong>{{ company.name }}</strong></td>
+            <td>{{ company.userEmail }}</td>
+            <td>
+              <span class="status-badge"
+                [ngClass]="{
+                  'status-active': company.userStatus === 'active',
+                  'status-suspended': company.userStatus === 'suspended',
+                  'status-banned': company.userStatus === 'banned'
+                }">
+                {{ company.userStatus }}
+              </span>
+            </td>
             <td>{{ company.tax_id }}</td>
 
             <td>
@@ -88,87 +126,158 @@
 
             <td>
               <div class="action-buttons">
-                <button class="btn-icon edit" (click)="openModifierCompany(company)" title="Modifier">✏️</button>
-                <button class="btn-icon delete" (click)="openConfirmDelete(company)" title="Supprimer">🗑️</button>
+                <button class="btn-icon user" (click)="openEditUser(company)" title="Edit User" *ngIf="company.user_id">
+                  <i class="fas fa-user-edit"></i>
+                </button>
+                <button class="btn-icon edit" (click)="openModifierCompany(company)" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-icon delete" (click)="openConfirmDelete(company)" title="Delete">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
               </div>
             </td>
           </tr>
 
+          <tr *ngIf="filteredCompanies.length === 0 && companies.length > 0">
+            <td colspan="8" style="text-align: center; padding: 2rem; color: #666; font-style: italic;">
+              No companies match your search.
+            </td>
+          </tr>
+
           <tr *ngIf="companies.length === 0">
-            <td colspan="7" style="text-align: center; padding: 2rem; color: #666; font-style: italic;">
-              Aucune société trouvée.
+            <td colspan="8" style="text-align: center; padding: 2rem; color: #666; font-style: italic;">
+              No companies found.
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Modal: Modifier Société -->
+    <!-- Modal: Edit Company -->
     <div class="modal" *ngIf="showModifierCompany && selectedCompany">
       <div class="modal-content">
         <div class="modal-header">
-          <h2>Modifier la société #{{ selectedCompany.id }}</h2>
+          <h2>Edit Company #{{ selectedCompany.id }}</h2>
           <button class="close-btn" (click)="closeModifierCompany()">×</button>
         </div>
 
         <div class="modal-body">
 
-          <!-- Champ : Nom -->
+          <!-- Field: Name -->
           <div class="form-group">
-            <label>Nom de la Société *</label>
+            <label>Company Name *</label>
             <input type="text" [(ngModel)]="selectedCompany.name" required>
           </div>
 
-          <!-- Champ : Matricule Fiscal -->
+          <!-- Field: Tax ID -->
           <div class="form-group">
-            <label>Matricule Fiscal *</label>
+            <label>Tax ID *</label>
             <input type="text" [(ngModel)]="selectedCompany.tax_id" required>
           </div>
 
-          <!-- Champ : Statut Légal (input text normal) -->
+          <!-- Field: Legal Status -->
           <div class="form-group">
-            <label>Statut Légal *</label>
+            <label>Legal Status *</label>
             <input type="text" [(ngModel)]="selectedCompany.legal_status" required>
           </div>
 
-          <div class="form-note">
+          <!-- Required fields note -->
+          <div class="required-note">
+            <i class="fas fa-info-circle"></i>
+            <span>All fields marked with * are required</span>
           </div>
         </div>
 
         <div class="modal-footer">
-          <button class="btn-secondary" (click)="closeModifierCompany()">Annuler</button>
-          <button class="btn-primary" (click)="modifierCompany()">Enregistrer les modifications</button>
+          <button class="btn-secondary" (click)="closeModifierCompany()">Cancel</button>
+          <button class="btn-primary" (click)="modifierCompany()">Save Changes</button>
         </div>
       </div>
     </div>
 
-    <!-- Modal: Confirmer Suppression -->
+    <!-- Modal: Confirm Delete -->
     <div class="modal" *ngIf="showConfirmDelete && selectedCompany">
       <div class="modal-content modal-small">
         <div class="modal-header">
-          <h2>⚠️ Confirmer la suppression</h2>
+          <h2><i class="fas fa-exclamation-triangle"></i> Confirm Deletion</h2>
         </div>
 
         <div class="modal-body">
           <p>
-            Êtes-vous sûr de vouloir supprimer la société
-            <strong>{{ selectedCompany.name }}</strong> ?
+            Are you sure you want to delete the company
+            <strong>{{ selectedCompany.name }}</strong>?
           </p>
 
           <div class="user-info-delete">
-            <p><strong>Matricule Fiscal:</strong> {{ selectedCompany.tax_id }}</p>
-            <p><strong>Statut:</strong> {{ selectedCompany.legal_status }}</p>
+            <p><strong>Tax ID:</strong> {{ selectedCompany.tax_id }}</p>
+            <p><strong>Status:</strong> {{ selectedCompany.legal_status }}</p>
             <p><strong>ID:</strong> #{{ selectedCompany.id }}</p>
           </div>
 
           <p class="warning-text">
-            ⚠️ Cette action est irréversible et supprimera définitivement toutes les données associées à cette société.
+            <i class="fas fa-exclamation-triangle"></i> This action is irreversible and will permanently delete all data associated with this company.
           </p>
         </div>
 
         <div class="modal-footer">
-          <button class="btn-secondary" (click)="closeConfirmDelete()">Annuler</button>
-          <button class="btn-danger" (click)="supprimerCompany()">Confirmer la suppression</button>
+          <button class="btn-secondary" (click)="closeConfirmDelete()">Cancel</button>
+          <button class="btn-danger" (click)="supprimerCompany()">Confirm Deletion</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Edit User -->
+    <div class="modal" *ngIf="showEditUser && selectedUser">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2><i class="fas fa-user-edit"></i> Edit User #{{ selectedUser.id }}</h2>
+          <button class="close-btn" (click)="closeEditUser()">×</button>
+        </div>
+
+        <div class="modal-body">
+
+          <!-- Field: Name -->
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" [(ngModel)]="selectedUser.name" required>
+          </div>
+
+          <!-- Field: Email -->
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" [(ngModel)]="selectedUser.email" required>
+          </div>
+
+          <!-- Field: Phone -->
+          <div class="form-group">
+            <label>Phone *</label>
+            <input type="text" [(ngModel)]="selectedUser.phone" placeholder="8 digits required">
+          </div>
+
+          <!-- Field: Address -->
+          <div class="form-group">
+            <label>Address *</label>
+            <input type="text" [(ngModel)]="selectedUser.address">
+          </div>
+
+          <!-- Field: Role (read-only) -->
+          <div class="form-group">
+            <label>Role</label>
+            <input type="text" [value]="selectedUser.role" disabled>
+          </div>
+
+          <!-- Required fields note -->
+          <div class="required-note">
+            <i class="fas fa-info-circle"></i>
+            <span>All fields marked with * are required</span>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-secondary" (click)="closeEditUser()">Cancel</button>
+          <button class="btn-primary" (click)="saveUser()">Save Changes</button>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
@@ -6,6 +6,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { SidebarComponent } from '../sidebar/sidebar.component/sidebar.component';
 import { CompanyService, Company } from '../../../core/services/company.service';
+import { UserService, User } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
 
 interface CompanyDisplay {
@@ -16,9 +17,10 @@ interface CompanyDisplay {
   tax_id?: string;
   legal_status?: string;
   dateCreation: string;
-  email?: string;
-  phone?: string;
-  address?: string;
+  userEmail?: string;
+  userPhone?: string;
+  userAddress?: string;
+  userStatus?: string;
 }
 
 @Component({
@@ -34,16 +36,25 @@ export class GestionCompany implements OnInit, OnDestroy {
   totalCompanies = 0;
   companiesActives = 0;
   companiesSuspendues = 0;
-  companiesVerifiees = 0;
   companies: CompanyDisplay[] = [];
+  filteredCompanies: CompanyDisplay[] = [];
+  searchTerm: string = '';
   showModifierCompany = false;
   showConfirmDelete = false;
+  showEditUser = false;
   selectedCompany: CompanyDisplay | null = null;
+  selectedUser: User | null = null;
+  
+  // Alert system
+  alertMessage = signal('');
+  alertType = signal<'success' | 'error' | 'warning' | ''>('');
+  
   private routerSubscription?: Subscription;
   private auth = inject(AuthService);
 
   constructor(
     private companyService: CompanyService,
+    private userService: UserService,
     private router: Router,
     private cdr: ChangeDetectorRef // ✅ Add ChangeDetectorRef
   ) {}
@@ -83,24 +94,63 @@ export class GestionCompany implements OnInit, OnDestroy {
 
   loadCompanies(): void {
     this.isLoading = true;
-    this.cdr.detectChanges(); // ✅ Force change detection
+    this.cdr.detectChanges();
     
     console.log('Loading companies...');
     
     this.companyService.getAllCompanies().subscribe({
       next: (companies: Company[]) => {
         console.log('Companies received:', companies);
-        this.companies = companies.map(company => this.transformCompany(company));
-        this.calculateStats();
-        this.isLoading = false;
-        this.cdr.detectChanges(); // ✅ Force change detection
-        console.log('Companies loaded:', this.companies);
+        
+        // Load each company and fetch its user details
+        const companyPromises = companies.map(company => {
+          return new Promise<CompanyDisplay>((resolve) => {
+            const companyDisplay = this.transformCompany(company);
+            
+            // Fetch user details if user_id exists
+            if (company.user_id) {
+              this.userService.getUserById(company.user_id).subscribe({
+                next: (user: User) => {
+                  companyDisplay.userEmail = user.email || 'N/A';
+                  companyDisplay.userPhone = user.phone || 'N/A';
+                  companyDisplay.userAddress = user.address || 'N/A';
+                  companyDisplay.userStatus = user.status || 'active';
+                  resolve(companyDisplay);
+                },
+                error: (err) => {
+                  console.error('Error loading user for company:', company.id, err);
+                  companyDisplay.userEmail = 'N/A';
+                  companyDisplay.userPhone = 'N/A';
+                  companyDisplay.userAddress = 'N/A';
+                  companyDisplay.userStatus = 'N/A';
+                  resolve(companyDisplay);
+                }
+              });
+            } else {
+              companyDisplay.userEmail = 'N/A';
+              companyDisplay.userPhone = 'N/A';
+              companyDisplay.userAddress = 'N/A';
+              companyDisplay.userStatus = 'N/A';
+              resolve(companyDisplay);
+            }
+          });
+        });
+
+        // Wait for all user details to be fetched
+        Promise.all(companyPromises).then((companiesWithUsers) => {
+          this.companies = companiesWithUsers;
+          this.filteredCompanies = [...this.companies];
+          this.calculateStats();
+          this.isLoading = false;
+          this.cdr.detectChanges();
+          console.log('Companies loaded with user details:', this.companies);
+        });
       },
       error: (error: any) => {
-        console.error('Erreur lors du chargement des companies:', error);
+        console.error('Error loading companies:', error);
         this.isLoading = false;
-        this.cdr.detectChanges(); // ✅ Force change detection
-        alert('Erreur lors du chargement des companies.');
+        this.cdr.detectChanges();
+        this.showAlert('Error loading companies', 'error');
       }
     });
   }
@@ -115,16 +165,48 @@ export class GestionCompany implements OnInit, OnDestroy {
       legal_status: company.legal_status || 'Non défini',
       dateCreation: company.created_at 
         ? new Date(company.created_at).toLocaleDateString('fr-FR') 
-        : new Date().toLocaleDateString('fr-FR')
+        : new Date().toLocaleDateString('fr-FR'),
+      userEmail: 'Loading...',
+      userPhone: 'Loading...',
+      userAddress: 'Loading...',
+      userStatus: 'Loading...'
     };
   }
 
   calculateStats(): void {
     this.totalCompanies = this.companies.length;
-    this.companiesActives = this.companies.filter(c => c.legal_status !== 'suspended').length;
-    this.companiesSuspendues = this.companies.filter(c => c.legal_status === 'suspended').length;
-    this.companiesVerifiees = this.companies.filter(c => c.tax_id && c.tax_id !== 'Non défini').length;
-    this.cdr.detectChanges(); // ✅ Force change detection
+    this.companiesActives = this.companies.filter(c => c.userStatus === 'active').length;
+    this.companiesSuspendues = this.companies.filter(c => c.userStatus === 'suspended').length;
+    this.cdr.detectChanges();
+  }
+
+  // Filter companies based on search term
+  filterCompanies(): void {
+    const search = this.searchTerm.toLowerCase().trim();
+    
+    if (!search) {
+      this.filteredCompanies = [...this.companies];
+    } else {
+      this.filteredCompanies = this.companies.filter(company => {
+        const matchName = company.name?.toLowerCase().includes(search);
+        const matchTaxId = company.tax_id?.toLowerCase().includes(search);
+        const matchEmail = company.userEmail?.toLowerCase().includes(search);
+        return matchName || matchTaxId || matchEmail;
+      });
+    }
+    this.cdr.detectChanges();
+  }
+
+  // Show alert message
+  showAlert(message: string, type: 'success' | 'error' | 'warning'): void {
+    this.alertMessage.set(message);
+    this.alertType.set(type);
+    this.cdr.detectChanges();
+    setTimeout(() => {
+      this.alertMessage.set('');
+      this.alertType.set('');
+      this.cdr.detectChanges();
+    }, 5000);
   }
 
   openModifierCompany(company: CompanyDisplay): void { 
@@ -151,14 +233,83 @@ export class GestionCompany implements OnInit, OnDestroy {
     this.cdr.detectChanges(); // ✅ Force change detection
   }
 
+  openEditUser(company: CompanyDisplay): void {
+    if (!company.user_id) {
+      this.showAlert('No user associated with this company', 'warning');
+      return;
+    }
+
+    this.userService.getUserById(company.user_id).subscribe({
+      next: (user: User) => {
+        this.selectedUser = { ...user };
+        this.showEditUser = true;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error loading user:', err);
+        this.showAlert('Error loading user data', 'error');
+      }
+    });
+  }
+
+  closeEditUser(): void {
+    this.selectedUser = null;
+    this.showEditUser = false;
+    this.cdr.detectChanges();
+  }
+
+  saveUser(): void {
+    if (!this.selectedUser || !this.selectedUser.id) return;
+
+    // Validate all required fields
+    if (!this.selectedUser.name || !this.selectedUser.email || !this.selectedUser.phone || !this.selectedUser.address) {
+      this.showAlert('All fields are required', 'warning');
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.selectedUser.email)) {
+      this.showAlert('Invalid email address', 'warning');
+      return;
+    }
+
+    // Validate phone is exactly 8 digits
+    const phoneRegex = /^\d{8}$/;
+    if (!phoneRegex.test(this.selectedUser.phone)) {
+      this.showAlert('Phone number must be exactly 8 digits', 'warning');
+      return;
+    }
+
+    const userData: Partial<User> = {
+      name: this.selectedUser.name,
+      email: this.selectedUser.email,
+      phone: this.selectedUser.phone,
+      address: this.selectedUser.address
+    };
+
+    this.userService.updateUser(this.selectedUser.id, userData).subscribe({
+      next: () => {
+        this.showAlert('User updated successfully', 'success');
+        this.loadCompanies();
+        this.closeEditUser();
+      },
+      error: (err) => {
+        console.error('Error:', err);
+        const errorMessage = err.error?.message || err.error?.error || err.message || 'Unknown error';
+        this.showAlert('Error updating user: ' + errorMessage, 'error');
+      }
+    });
+  }
+
   modifierCompany(): void {
     if (!this.selectedCompany || 
       !this.selectedCompany.name || 
       !this.selectedCompany.tax_id || 
       !this.selectedCompany.legal_status) {
-    alert('Veuillez remplir tous les champs obligatoires');
-    return;
-  }
+      this.showAlert('Please fill in all required fields', 'warning');
+      return;
+    }
 
     if (!this.selectedCompany || !this.selectedCompany.id) return;
 
@@ -170,14 +321,14 @@ export class GestionCompany implements OnInit, OnDestroy {
 
     this.companyService.updateCompany(this.selectedCompany.id, companyData).subscribe({
       next: () => {
-        alert('Société modifiée avec succès');
+        this.showAlert('Company updated successfully', 'success');
         this.loadCompanies();
         this.closeModifierCompany();
       },
       error: (err) => {
-        console.error('Erreur complète:', err);
-        const errorMessage = err.error?.message || err.error?.error || err.message || 'Erreur inconnue';
-        alert('Erreur modification société: ' + errorMessage);
+        console.error('Error:', err);
+        const errorMessage = err.error?.message || err.error?.error || err.message || 'Unknown error';
+        this.showAlert('Error updating company: ' + errorMessage, 'error');
       }
     });
   }
@@ -188,14 +339,14 @@ export class GestionCompany implements OnInit, OnDestroy {
 
     this.companyService.deleteCompany(this.selectedCompany.id).subscribe({
       next: () => {
-        alert('Société supprimée avec succès');
+        this.showAlert('Company deleted successfully', 'success');
         this.loadCompanies();
         this.closeConfirmDelete();
       },
       error: (err) => {
-        console.error('Erreur complète:', err);
-        const errorMessage = err.error?.message || err.error?.error || err.message || 'Erreur inconnue';
-        alert('Erreur suppression société: ' + errorMessage);
+        console.error('Error:', err);
+        const errorMessage = err.error?.message || err.error?.error || err.message || 'Unknown error';
+        this.showAlert('Error deleting company: ' + errorMessage, 'error');
       }
     });
   }

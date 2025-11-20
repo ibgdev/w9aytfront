@@ -1,7 +1,6 @@
 .layout {
   display: flex;
   min-height: 100vh;
-  min-width: 200vh;
   background-color: #f5f7fa;
 }
 
@@ -11,11 +10,64 @@
   margin-left: 250px;
   background-color: #f5f7fb;
   min-height: 100vh;
+  max-width: calc(100vw - 250px);
+  overflow-x: hidden;
 }
 
 :host {
   display: block;
   background: transparent !important;
+}
+
+// ============== ALERT MESSAGES ==============
+.alert-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  min-width: 350px;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  animation: slideInRight 0.3s ease;
+
+  i {
+    font-size: 1.25rem;
+  }
+
+  &.alert-success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border-left: 4px solid #10b981;
+  }
+
+  &.alert-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+  }
+
+  &.alert-warning {
+    background-color: #fef3c7;
+    color: #92400e;
+    border-left: 4px solid #f59e0b;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .right-scroll-area {
@@ -58,12 +110,14 @@
 
     .icon {
       font-size: 2rem;
+      color: #2196f3;
     }
 
     h1 {
       margin: 0;
       font-size: 1.75rem;
       color: #1a1a1a;
+      font-family: 'Poppins', sans-serif;
     }
 
     p {
@@ -74,10 +128,70 @@
   }
 }
 
-// ============== STATISTIQUES ==============
+// ============== SEARCH SECTION ==============
+.search-section {
+  margin-bottom: 2rem;
+}
+
+.search-box {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+
+  &:focus-within {
+    border-color: #2196f3;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+  }
+
+  i.fa-search {
+    color: #666;
+    margin-right: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 0.95rem;
+    font-family: 'Poppins', sans-serif;
+
+    &::placeholder {
+      color: #999;
+    }
+  }
+
+  .clear-search {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #333;
+    }
+
+    i {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// ============== STATISTICS CARDS ==============
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -91,8 +205,7 @@
   align-items: center;
   gap: 1rem;
   transition: transform 0.2s;
-  width: 400px;   // largeur
-  height: 160px;  // hauteur
+  min-height: 120px;
 
   &:hover {
     transform: translateY(-4px);
@@ -103,22 +216,29 @@
     font-size: 2.5rem;
     padding: 1rem;
     border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   &.blue .stat-icon {
     background-color: #e3f2fd;
+    color: #2196f3;
   }
 
   &.purple .stat-icon {
     background-color: #f3e5f5;
+    color: #9c27b0;
   }
 
   &.orange .stat-icon {
     background-color: #fff3e0;
+    color: #ff9800;
   }
 
   &.green .stat-icon {
     background-color: #e8f5e9;
+    color: #4caf50;
   }
 
   .stat-info {
@@ -127,6 +247,7 @@
       font-size: 0.85rem;
       color: #666;
       font-weight: 500;
+      font-family: 'Poppins', sans-serif;
     }
 
     .stat-number {
@@ -134,6 +255,7 @@
       font-weight: 700;
       color: #1a1a1a;
       margin: 0.25rem 0;
+      font-family: 'Poppins', sans-serif;
     }
 
     .stat-subtitle {
@@ -148,12 +270,13 @@
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
+  overflow-x: auto;
 }
 
 .users-table {
   width: 100%;
   border-collapse: collapse;
+  font-family: 'Poppins', sans-serif;
 
   thead {
     background-color: #f8f9fa;
@@ -283,20 +406,35 @@
     align-items: center;
     justify-content: center;
 
+    &.user {
+      background-color: #e8f5e9;
+      color: #4caf50;
+
+      &:hover {
+        background-color: #4caf50;
+        color: white;
+        transform: scale(1.1);
+      }
+    }
+
     &.edit {
       background-color: #e3f2fd;
+      color: #2196f3;
 
       &:hover {
         background-color: #2196f3;
+        color: white;
         transform: scale(1.1);
       }
     }
 
     &.delete {
       background-color: #ffebee;
+      color: #f44336;
 
       &:hover {
         background-color: #f44336;
+        color: white;
         transform: scale(1.1);
       }
     }
@@ -392,6 +530,23 @@
   }
 }
 
+.required-note {
+  margin-top: 1.5rem;
+  padding: 0.75rem 1rem;
+  background-color: #f0f4ff;
+  border-left: 3px solid #2196f3;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #333;
+
+  i {
+    color: #2196f3;
+  }
+}
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -419,6 +574,12 @@ select {
 
   &::placeholder {
     color: #999;
+  }
+
+  &:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+    color: #666;
   }
 }
 
@@ -514,6 +675,11 @@ select {
 
 // ============== RESPONSIVE ==============
 @media (max-width: 1024px) {
+  .main-content {
+    margin-left: 0;
+    max-width: 100vw;
+  }
+
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -552,6 +718,17 @@ select {
       padding: 0.75rem 0.5rem;
     }
   }
+
+  .action-buttons {
+    flex-direction: row;
+    gap: 0.25rem;
+
+    .btn-icon {
+      width: 28px;
+      height: 28px;
+      font-size: 0.85rem;
+    }
+  }
 }
 
 @media (max-width: 480px) {
@@ -566,9 +743,5 @@ select {
         font-size: 1.5rem;
       }
     }
-  }
-
-  .action-buttons {
-    flex-direction: column;
   }
 }
