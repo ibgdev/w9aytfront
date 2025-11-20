@@ -30,6 +30,11 @@ export class SidebarComponent {
       icon: 'fas fa-check-circle',
       label: 'Validate Requests',
       route: '/admin/validation'
+    },
+    {
+      icon: 'fas fa-envelope',
+      label: 'Contact Messages',
+      route: '/admin/contact-messages'
     }
   ];
 

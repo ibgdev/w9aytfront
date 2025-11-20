@@ -1,0 +1,126 @@
+<div class="layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-content">
+
+    <!-- Alert Container -->
+    @if (alertMessage()) {
+      <div class="alert-container" [ngClass]="'alert-' + alertType()">
+        <i class="fas" [ngClass]="{
+          'fa-check-circle': alertType() === 'success',
+          'fa-exclamation-circle': alertType() === 'error',
+          'fa-exclamation-triangle': alertType() === 'warning'
+        }"></i>
+        <span>{{ alertMessage() }}</span>
+      </div>
+    }
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <i class="fas fa-envelope icon"></i>
+        <div>
+          <h1>Contact Messages</h1>
+          <p>View and manage user contact messages</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-section">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (input)="filterContacts()"
+          placeholder="Search by name or email"
+          class="search-input">
+        <button *ngIf="searchTerm" (click)="searchTerm = ''; filterContacts()" class="clear-search">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading-section">
+      <div class="spinner"></div>
+      <p>Loading contact messages...</p>
+    </div>
+
+    <!-- Contact Messages Table -->
+    <div class="table-card" *ngIf="!isLoading">
+      <table class="contacts-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let contact of filteredContacts">
+            <td>{{ contact.id }}</td>
+            <td><strong>{{ contact.fullname }}</strong></td>
+            <td>{{ contact.email }}</td>
+            <td>{{ contact.tell }}</td>
+            <td>
+              <div class="actions">
+                <button class="btn-icon delete" (click)="openDeleteConfirm(contact)" title="Delete">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="filteredContacts.length === 0 && contacts.length > 0">
+            <td colspan="6" style="text-align: center; padding: 2rem; color: #666; font-style: italic;">
+              No contact messages match your search.
+            </td>
+          </tr>
+
+          <tr *ngIf="contacts.length === 0">
+            <td colspan="6" style="text-align: center; padding: 2rem; color: #666; font-style: italic;">
+              No contact messages found.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal: Confirm Delete -->
+    <div class="modal" *ngIf="showDeleteConfirm && selectedContact">
+      <div class="modal-content modal-small">
+        <div class="modal-header">
+          <h2><i class="fas fa-exclamation-triangle"></i> Confirm Deletion</h2>
+        </div>
+
+        <div class="modal-body">
+          <p>
+            Are you sure you want to delete the message from
+            <strong>{{ selectedContact.fullname }}</strong>?
+          </p>
+
+          <div class="contact-info-delete">
+            <p><strong>Email:</strong> {{ selectedContact.email }}</p>
+            <p><strong>Phone:</strong> {{ selectedContact.tell }}</p>
+            <p><strong>ID:</strong> #{{ selectedContact.id }}</p>
+          </div>
+
+          <p class="warning-text">
+            <i class="fas fa-exclamation-triangle"></i> This action is irreversible.
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-secondary" (click)="closeDeleteConfirm()">Cancel</button>
+          <button class="btn-danger" (click)="deleteContact()">Confirm Deletion</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

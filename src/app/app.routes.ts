@@ -11,6 +11,7 @@ import { SidebarComponent } from './features/admin/sidebar/sidebar.component/sid
 import { GestionUtilisateurs } from './features/admin/gestion-utilisateurs.component/gestion-utilisateurs.component';
 import { GestionCompany } from './features/admin/gestion-company.component/gestion-company.component';
 import { ValidationDemandesComponent } from './features/admin/validation-demandes.component/validation-demandes.component';
+import { ContactMessagesComponent } from './features/admin/contact-messages.component/contact-messages.component';
 import { DashboardComponent } from './features/admin/dashboard.component/dashboard.component';
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -64,6 +65,10 @@ export const routes: Routes = [
   {
     path: 'admin/validation',
     component: ValidationDemandesComponent,
+  },
+  {
+    path: 'admin/contact-messages',
+    component: ContactMessagesComponent,
   },
 
   {
