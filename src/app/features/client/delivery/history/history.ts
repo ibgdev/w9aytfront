@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { Navbar } from '../../../../navbar/navbar';
 import { Footer } from '../../../../footer/footer';
 import { ContactUs } from '../../../../home/contact-us/contact-us';
+import { AuthService } from '../../../../core/services/auth.service';
 
 
 @Component({
@@ -24,14 +25,21 @@ export class History implements OnInit {
   totalPages: number = 1;
   totalDeliveries: number = 0;
 
-  constructor(private deliveryService: DeliveryService) {}
+  constructor(
+    private deliveryService: DeliveryService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
   this.fetchDeliveries();
   }
 
   fetchDeliveries(params?: any) {
+    const currentUser = this.authService.getCurrentUser();
     const queryParams = { ...params, page: this.currentPage, pageSize: this.pageSize };
+    if (currentUser && currentUser.id) {
+      queryParams.client_id = currentUser.id;
+    }
     this.deliveryService.getDeliveryHistory(queryParams).subscribe((res: any) => {
       this.deliveries = res.data || [];
       this.totalDeliveries = res.total || 0;
