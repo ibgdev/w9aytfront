@@ -8,6 +8,7 @@ import { ResetPassword } from './features/authentication/reset-password/reset-pa
 import { Notfound } from './notfound/notfound';
 import { Profile } from './features/client/profile/profile';
 import { NewDeliveryComponent } from './features/client/delivery/new-delivery/new-delivery';
+import { History } from './features/client/delivery/history/history';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -46,6 +47,9 @@ export const routes: Routes = [
    {
     path: 'new-delivery',
     component: NewDeliveryComponent
+  }, {
+    path: 'history',
+    component: History
   },
   { 
     path: '**', component: Notfound

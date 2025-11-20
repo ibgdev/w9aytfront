@@ -1,0 +1,53 @@
+<app-navbar></app-navbar>
+<div class="history-container">
+	<h2>HistoryPage</h2>
+	<div class="search-bar">
+		<input type="text" [(ngModel)]="searchTerm" (input)="onSearchChange()" placeholder="Search for Orders" />
+		<select [(ngModel)]="selectedStatus">
+			<option value="">All statuses</option>
+			<option value="pending">Pending</option>
+			<option value="assigned">Assigned</option>
+			<option value="in_transit">In transit</option>
+			<option value="delivered">Delivered</option>
+			<option value="cancelled">Cancelled</option>
+		</select>
+		<button (click)="applyFilters()">Filter</button>
+		<button (click)="clearFilters()">Clear</button>
+	</div>
+
+	<div *ngFor="let delivery of filteredDeliveries" class="delivery-card">
+		<div class="delivery-info">
+			<div>
+				<p><b>Company:</b> {{delivery.company_name || 'Non renseignée'}}</p>
+				<p><b>Driver:</b> {{delivery.driver_name || 'Non assigné'}}</p>
+				<p><b>Receiver:</b> {{delivery.receiver_name}} <span
+						*ngIf="delivery.receiver_phone">({{delivery.receiver_phone}})</span></p>
+				<p><b>Pickup:</b> {{delivery.pickup_address}}</p>
+				<p><b>Dropoff:</b> {{delivery.dropoff_address}}</p>
+				<p><b>Weight:</b> {{delivery.weight}} kg</p>
+				<p><b>Size:</b> {{delivery.size}}</p>
+				<p><b>Price:</b> {{delivery.price}} {{delivery.currency}}</p>
+				<p>
+					<b>Status:</b>
+					<span class="status-badge" [ngClass]="delivery.status">
+						{{ formatStatus(delivery.status) }}
+					</span>
+				</p> <!-- show cancel button only for pending deliveries -->
+				<button *ngIf="delivery.status === 'pending'" class="cancel-btn" (click)="cancelOrder(delivery)">Cancel
+					order</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="pagination">
+		<button (click)="goToPage(currentPage-1)" [disabled]="currentPage === 1">&lt;</button>
+		<span *ngFor="let page of [].constructor(totalPages); let i = index">
+			<button (click)="goToPage(i+1)" [class.active]="currentPage === i+1">{{i+1}}</button>
+		</span>
+		<button (click)="goToPage(currentPage+1)" [disabled]="currentPage === totalPages">&gt;</button>
+	</div>
+
+	<!-- Pagination supprimée, tout l'historique est affiché directement -->
+</div>
+<app-contact-us></app-contact-us>
+<app-footer></app-footer>
