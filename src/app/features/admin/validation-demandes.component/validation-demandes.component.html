@@ -1,0 +1,40 @@
+<div class="layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-content">
+    
+    <div class="header">
+      <h1>Validation Demandes</h1>
+    </div>
+
+    <div *ngIf="!isLoading">
+      <div *ngFor="let user of users" class="user-card">
+        
+        <div class="user-info">
+          <h3>{{ user.name }}</h3>
+          <p>Email: {{ user.email }}</p>
+          <p>Status: {{ getStatusText(user.status) }}</p>
+        </div>
+
+        <!-- LES 2 BOUTONS -->
+        <div class="actions">
+          <button 
+            class="btn-approve" 
+            (click)="approveUser(user)"
+            [disabled]="user.status === 'active'">
+            ✅ Approve
+          </button>
+
+          <button 
+            class="btn-reject" 
+            (click)="rejectUser(user)"
+            [disabled]="user.status === 'banned'">
+            🚫 Reject
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

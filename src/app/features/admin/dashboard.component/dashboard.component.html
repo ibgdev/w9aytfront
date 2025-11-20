@@ -1,0 +1,250 @@
+<div class="layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-content">
+    
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <span class="icon">📊</span>
+        <div>
+          <h1>Tableau de Bord</h1>
+          <p>Vue d'ensemble des statistiques</p>
+        </div>
+      </div>
+      <div class="header-right">
+        
+      </div>
+    </div>
+
+    <!-- Statistiques principales -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-header">
+          <h3>délivery-borne</h3>
+          <span class="stat-badge">+100%</span>
+        </div>
+        <div class="stat-number">65</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <h3>Directeur dans</h3>
+          <span class="stat-badge">+1%</span>
+        </div>
+        <div class="stat-number">5</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <h3>Télévisionn</h3>
+          <span class="stat-badge">0.1cm</span>
+        </div>
+        <div class="stat-number">256</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <h3>Chiffre d'affaires</h3>
+          <span class="stat-badge">+10%</span>
+        </div>
+        <div class="stat-number">23.9M €</div>
+      </div>
+    </div>
+
+    <!-- Graphique et tableau -->
+    <div class="dashboard-content">
+      <!-- Section graphique -->
+      <div class="chart-section">
+        <div class="chart-header">
+          <h3>Délivery-port (bode, 1800)</h3>
+          <p>Délivery-option nominal</p>
+        </div>
+        <div class="chart-placeholder">
+          <!-- Diagramme en barres -->
+          <div class="chart-bars">
+            <div class="chart-bar" style="height: 80%"></div>
+            <div class="chart-bar" style="height: 60%"></div>
+            <div class="chart-bar" style="height: 90%"></div>
+            <div class="chart-bar" style="height: 70%"></div>
+            <div class="chart-bar" style="height: 85%"></div>
+          </div>
+        </div>
+        <div class="chart-footer">
+          <p>Bord fixe au besoin</p>
+        </div>
+      </div>
+
+      <!-- Section tableau -->
+      <div class="table-section">
+        <h3>Activité récente</h3>
+        <table class="dashboard-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Télévisionn</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>200</td>
+              <td>4.00m</td>
+              <td>30%</td>
+            </tr>
+            <tr>
+              <td>300</td>
+              <td>4.00m</td>
+              <td>20%</td>
+            </tr>
+            <tr>
+              <td>400</td>
+              <td>4.00m</td>
+              <td>24%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Cartes supplémentaires avec diagrammes -->
+    <div class="additional-cards">
+      <!-- Diagramme circulaire -->
+      <div class="chart-card">
+        <div class="card-header">
+          <h4>Répartition des livraisons</h4>
+        </div>
+        <div class="pie-chart-container">
+          <div class="pie-chart">
+            <div class="pie-segment" style="--percentage: 40; --color: #007bff;"></div>
+            <div class="pie-segment" style="--percentage: 25; --color: #28a745;"></div>
+            <div class="pie-segment" style="--percentage: 20; --color: #ffc107;"></div>
+            <div class="pie-segment" style="--percentage: 15; --color: #dc3545;"></div>
+          </div>
+          <div class="pie-legend">
+            <div class="legend-item">
+              <span class="legend-color" style="background-color: #007bff;"></span>
+              <span>Express (40%)</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background-color: #28a745;"></span>
+              <span>Standard (25%)</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background-color: #ffc107;"></span>
+              <span>Économique (20%)</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background-color: #dc3545;"></span>
+              <span>Premium (15%)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diagramme en ligne -->
+      <div class="chart-card">
+        <div class="card-header">
+          <h4>Évolution mensuelle</h4>
+        </div>
+        <div class="line-chart-container">
+          <div class="line-chart">
+            <svg viewBox="0 0 300 150" class="line-svg">
+              <path d="M0,120 L60,90 L120,60 L180,100 L240,80 L300,40" 
+                    class="line-path" />
+              <circle cx="0" cy="120" r="3" class="data-point" />
+              <circle cx="60" cy="90" r="3" class="data-point" />
+              <circle cx="120" cy="60" r="3" class="data-point" />
+              <circle cx="180" cy="100" r="3" class="data-point" />
+              <circle cx="240" cy="80" r="3" class="data-point" />
+              <circle cx="300" cy="40" r="3" class="data-point" />
+            </svg>
+          </div>
+          <div class="line-labels">
+            <span>Jan</span>
+            <span>Fév</span>
+            <span>Mar</span>
+            <span>Avr</span>
+            <span>Mai</span>
+            <span>Juin</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diagramme à barres horizontales -->
+      <div class="chart-card">
+        <div class="card-header">
+          <h4>Performance par région</h4>
+        </div>
+        <div class="bar-chart-container">
+          <div class="horizontal-bar">
+            <div class="bar-label">Nord</div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width: 85%"></div>
+            </div>
+            <div class="bar-value">85%</div>
+          </div>
+          <div class="horizontal-bar">
+            <div class="bar-label">Sud</div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width: 72%"></div>
+            </div>
+            <div class="bar-value">72%</div>
+          </div>
+          <div class="horizontal-bar">
+            <div class="bar-label">Est</div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width: 68%"></div>
+            </div>
+            <div class="bar-value">68%</div>
+          </div>
+          <div class="horizontal-bar">
+            <div class="bar-label">Ouest</div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width: 91%"></div>
+            </div>
+            <div class="bar-value">91%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diagramme de progression -->
+      <div class="chart-card">
+        <div class="card-header">
+          <h4>Taux de réussite</h4>
+        </div>
+        <div class="progress-chart-container">
+          <div class="progress-item">
+            <div class="progress-label">Livraisons</div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 92%"></div>
+            </div>
+            <div class="progress-value">92%</div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-label">Clients</div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 78%"></div>
+            </div>
+            <div class="progress-value">78%</div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-label">Retours</div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 95%"></div>
+            </div>
+            <div class="progress-value">95%</div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-label">Satisfaction</div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 88%"></div>
+            </div>
+            <div class="progress-value">88%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

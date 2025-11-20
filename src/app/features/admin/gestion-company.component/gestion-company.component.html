@@ -1,0 +1,177 @@
+<div class="layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-content">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <span class="icon">🏢</span>
+        <div>
+          <h1>Gestion des Sociétés</h1>
+          <p>Administration des entreprises</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="stats-grid">
+      <div class="stat-card blue">
+        <div class="stat-icon">🏢</div>
+        <div class="stat-info">
+          <h3>Total Sociétés</h3>
+          <p class="stat-number">{{ totalCompanies }}</p>
+          <span class="stat-subtitle">Toutes catégories</span>
+        </div>
+      </div>
+
+      <div class="stat-card green">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <h3>Actives</h3>
+          <p class="stat-number">{{ companiesActives }}</p>
+          <span class="stat-subtitle">En activité</span>
+        </div>
+      </div>
+
+      <div class="stat-card orange">
+        <div class="stat-icon">⏸️</div>
+        <div class="stat-info">
+          <h3>Suspendues</h3>
+          <p class="stat-number">{{ companiesSuspendues }}</p>
+          <span class="stat-subtitle">En attente</span>
+        </div>
+      </div>
+
+      <div class="stat-card purple">
+        <div class="stat-icon">🔍</div>
+        <div class="stat-info">
+          <h3>Vérifiées</h3>
+          <p class="stat-number">{{ companiesVerifiees }}</p>
+          <span class="stat-subtitle">Documents validés</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom de la Société</th>
+            <th>Matricule Fiscal</th>
+            <th>Statut Légal</th>
+            <th>Date de Création</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let company of companies">
+
+            <td>{{ company.id }}</td>
+            <td><strong>{{ company.name }}</strong></td>
+            <td>{{ company.tax_id }}</td>
+
+            <td>
+              <span class="badge"
+                [ngClass]="{
+                  'status-active': company.legal_status !== 'suspended',
+                  'status-suspended': company.legal_status === 'suspended'
+                }">
+                {{ company.legal_status }}
+              </span>
+            </td>
+
+            <td>{{ company.dateCreation }}</td>
+
+            <td>
+              <div class="action-buttons">
+                <button class="btn-icon edit" (click)="openModifierCompany(company)" title="Modifier">✏️</button>
+                <button class="btn-icon delete" (click)="openConfirmDelete(company)" title="Supprimer">🗑️</button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="companies.length === 0">
+            <td colspan="7" style="text-align: center; padding: 2rem; color: #666; font-style: italic;">
+              Aucune société trouvée.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal: Modifier Société -->
+    <div class="modal" *ngIf="showModifierCompany && selectedCompany">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Modifier la société #{{ selectedCompany.id }}</h2>
+          <button class="close-btn" (click)="closeModifierCompany()">×</button>
+        </div>
+
+        <div class="modal-body">
+
+          <!-- Champ : Nom -->
+          <div class="form-group">
+            <label>Nom de la Société *</label>
+            <input type="text" [(ngModel)]="selectedCompany.name" required>
+          </div>
+
+          <!-- Champ : Matricule Fiscal -->
+          <div class="form-group">
+            <label>Matricule Fiscal *</label>
+            <input type="text" [(ngModel)]="selectedCompany.tax_id" required>
+          </div>
+
+          <!-- Champ : Statut Légal (input text normal) -->
+          <div class="form-group">
+            <label>Statut Légal *</label>
+            <input type="text" [(ngModel)]="selectedCompany.legal_status" required>
+          </div>
+
+          <div class="form-note">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-secondary" (click)="closeModifierCompany()">Annuler</button>
+          <button class="btn-primary" (click)="modifierCompany()">Enregistrer les modifications</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Confirmer Suppression -->
+    <div class="modal" *ngIf="showConfirmDelete && selectedCompany">
+      <div class="modal-content modal-small">
+        <div class="modal-header">
+          <h2>⚠️ Confirmer la suppression</h2>
+        </div>
+
+        <div class="modal-body">
+          <p>
+            Êtes-vous sûr de vouloir supprimer la société
+            <strong>{{ selectedCompany.name }}</strong> ?
+          </p>
+
+          <div class="user-info-delete">
+            <p><strong>Matricule Fiscal:</strong> {{ selectedCompany.tax_id }}</p>
+            <p><strong>Statut:</strong> {{ selectedCompany.legal_status }}</p>
+            <p><strong>ID:</strong> #{{ selectedCompany.id }}</p>
+          </div>
+
+          <p class="warning-text">
+            ⚠️ Cette action est irréversible et supprimera définitivement toutes les données associées à cette société.
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-secondary" (click)="closeConfirmDelete()">Annuler</button>
+          <button class="btn-danger" (click)="supprimerCompany()">Confirmer la suppression</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
