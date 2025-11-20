@@ -11,7 +11,7 @@ import { SidebarComponent } from './features/admin/sidebar/sidebar.component/sid
 import { GestionUtilisateurs } from './features/admin/gestion-utilisateurs.component/gestion-utilisateurs.component';
 import { GestionCompany } from './features/admin/gestion-company.component/gestion-company.component';
 import { ValidationDemandesComponent } from './features/admin/validation-demandes.component/validation-demandes.component';
-import {DashboardComponent} from './features/admin/dashboard.component/dashboard.component';
+import { DashboardComponent } from './features/admin/dashboard.component/dashboard.component';
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
@@ -28,51 +28,46 @@ export const routes: Routes = [
   },
   {
     path: 'become-a-company',
-    component: CompanySignup 
+    component: CompanySignup,
   },
   {
     path: 'forgot-password',
-    component: ForgotPassword
+    component: ForgotPassword,
   },
   {
     path: 'reset-password',
-    component: ResetPassword
+    component: ResetPassword,
   },
   {
     path: 'verify-email',
-    loadComponent: () => import('./features/authentication/verify-email/verify-email').then(m => m.VerifyEmailComponent)
+    loadComponent: () =>
+      import('./features/authentication/verify-email/verify-email').then(
+        (m) => m.VerifyEmailComponent
+      ),
   },
   {
     path: 'profile',
-    component: Profile
+    component: Profile,
   },
-  /*
-    {
+  {
     path: 'admin',
-    component: SidebarComponent,
-     
-  },*/
-    {
+    component: DashboardComponent,
+  },
+  {
     path: 'admin/gestion-utilisateurs',
-  component: GestionUtilisateurs
- 
+    component: GestionUtilisateurs,
   },
-   {
-  path: 'admin/company',
-  component: GestionCompany
-},
   {
-  path: 'admin/validation',
-  component: ValidationDemandesComponent
-},
+    path: 'admin/company',
+    component: GestionCompany,
+  },
   {
-  path: 'admin/dashboard',
-  component: DashboardComponent
-},
+    path: 'admin/validation',
+    component: ValidationDemandesComponent,
+  },
 
-  
-  { 
-    path: '**', component: Notfound
+  {
+    path: '**',
+    component: Notfound,
   },
- 
 ];

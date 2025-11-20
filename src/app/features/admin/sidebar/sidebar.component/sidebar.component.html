@@ -1,7 +1,7 @@
 <div class="sidebar">
   <div class="logo-container">
     <div class="logo">
-      <img src="logo-trans-full-white.png" alt="Logo Entreprise">
+      <img src="logo-trans-full-white.png" alt="Company Logo">
     </div>
   </div>
 
@@ -13,15 +13,15 @@
       class="menu-item"
       style="cursor: pointer;"
     >
-      <span class="icon">{{ item.icon }}</span>
+      <i [class]="item.icon" class="icon"></i>
       <span class="label">{{ item.label }}</span>
     </a>
   </nav>
 
   <div class="logout-container">
     <button class="logout-btn" (click)="logout()">
-      <span class="icon">🚪</span>
-      <span class="label">Déconnexion</span>
+      <i class="fas fa-sign-out-alt icon"></i>
+      <span class="label">Logout</span>
     </button>
   </div>
 </div>

@@ -11,29 +11,26 @@ import { RouterModule, Router } from '@angular/router'; // ✅ VÉRIFIER CETTE L
 })
 export class SidebarComponent {
   menuItems = [
-    
-     {
-      icon: '👥',
-      label: 'Gestion des Utilisateurs',
-      route: '/admin/gestion-utilisateurs' // ✅ Vérifier qu'il n'y a pas d'espace
+    {
+      icon: 'fas fa-chart-line',
+      label: 'Dashboard',
+      route: '/admin'
     },
     {
-      icon: '🏢',
-      label: 'Gestion des Sociétés',
+      icon: 'fas fa-users-cog',
+      label: 'User Management',
+      route: '/admin/gestion-utilisateurs'
+    },
+    {
+      icon: 'fas fa-building',
+      label: 'Company Management',
       route: '/admin/company'
     },
-   
     {
-      icon: '✓',
-      label: 'Validation Demandes',
+      icon: 'fas fa-check-circle',
+      label: 'Validate Requests',
       route: '/admin/validation'
-    },
-    {
-      icon: '📈',
-      label: 'Tableau de bord',
-      route: '/admin/dashboard'
     }
-    
   ];
 
   constructor(public router: Router) {}
