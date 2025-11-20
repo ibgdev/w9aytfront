@@ -1,7 +1,9 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { UserService, User } from '../../../core/services/user.service';
 import { SidebarComponent } from '../sidebar/sidebar.component/sidebar.component';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-validation-demandes',
@@ -14,6 +16,8 @@ export class ValidationDemandesComponent implements OnInit {
   
   users: User[] = [];
   isLoading = false;
+  private auth = inject(AuthService);
+  private router = inject(Router);
 
   constructor(
     private userService: UserService,
@@ -21,6 +25,19 @@ export class ValidationDemandesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Check if user is logged in
+    if (!this.auth.isLoggedIn()) {
+      this.router.navigateByUrl('/login');
+      return;
+    }
+
+    // Check if user is admin
+    const user = this.auth.getCurrentUser();
+    if (user?.role !== 'admin') {
+      this.router.navigateByUrl('/home');
+      return;
+    }
+
     this.loadUsers();
   }
 

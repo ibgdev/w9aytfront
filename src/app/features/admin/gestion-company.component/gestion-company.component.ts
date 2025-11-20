@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
@@ -6,6 +6,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { SidebarComponent } from '../sidebar/sidebar.component/sidebar.component';
 import { CompanyService, Company } from '../../../core/services/company.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface CompanyDisplay {
   id?: number;
@@ -39,6 +40,7 @@ export class GestionCompany implements OnInit, OnDestroy {
   showConfirmDelete = false;
   selectedCompany: CompanyDisplay | null = null;
   private routerSubscription?: Subscription;
+  private auth = inject(AuthService);
 
   constructor(
     private companyService: CompanyService,
@@ -47,6 +49,19 @@ export class GestionCompany implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // Check if user is logged in
+    if (!this.auth.isLoggedIn()) {
+      this.router.navigateByUrl('/login');
+      return;
+    }
+
+    // Check if user is admin
+    const user = this.auth.getCurrentUser();
+    if (user?.role !== 'admin') {
+      this.router.navigateByUrl('/home');
+      return;
+    }
+
     console.log('GestionCompany ngOnInit called');
     this.loadCompanies();
     

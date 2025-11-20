@@ -13,16 +13,21 @@ import { Router } from '@angular/router';
 export class Login implements OnInit {
   ngOnInit(): void {
     if (this.auth.isLoggedIn()) {
-      this.router.navigateByUrl('/home')
+      const user = this.auth.getCurrentUser();
+      if (user?.role === 'admin') {
+        this.router.navigateByUrl('/admin');
+      } else {
+        this.router.navigateByUrl('/home');
+      }
     }
-      const params = new URLSearchParams(window.location.search);
-  if (params.get('verified') === 'true') {
-    if (params.get('already') === 'true') {
-      this.showMessage('Your account is already verified. Please login.');
-    } else {
-      this.showMessage('Email verified successfully! You can now login.');
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('verified') === 'true') {
+      if (params.get('already') === 'true') {
+        this.showMessage('Your account is already verified. Please login.');
+      } else {
+        this.showMessage('Email verified successfully! You can now login.');
+      }
     }
-  }
   }
   
   private fb = inject(FormBuilder);
@@ -71,7 +76,13 @@ export class Login implements OnInit {
         this.loading.set(false);
         if (res.success && res.token && res.user) {
           this.auth.saveSession(res.token, res.user);
-          this.router.navigateByUrl('/home'); // Fixed method name
+          
+          // Redirect based on user role
+          if (res.user.role === 'admin') {
+            this.router.navigateByUrl('/admin');
+          } else {
+            this.router.navigateByUrl('/home');
+          }
         } else {
           this.errorMessage.set('Invalid credentials');
         }
