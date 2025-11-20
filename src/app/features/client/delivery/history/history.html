@@ -11,11 +11,14 @@
 			<option value="delivered">Delivered</option>
 			<option value="cancelled">Cancelled</option>
 		</select>
-		<button (click)="applyFilters()">Filter</button>
-		<button (click)="clearFilters()">Clear</button>
+		<button (click)="applyFilters()" [disabled]="isLoading">Filter</button>
+		<button (click)="clearFilters()" [disabled]="isLoading">Clear</button>
 	</div>
 
-	<div *ngFor="let delivery of filteredDeliveries" class="delivery-card">
+		<div *ngIf="isLoading" class="loading">Loading…</div>
+
+		<ng-container *ngIf="!isLoading">
+		<div *ngFor="let delivery of filteredDeliveries" class="delivery-card">
 		<div class="delivery-info">
 			<div>
 				<p><b>Company:</b> {{delivery.company_name || 'Non renseignée'}}</p>
@@ -38,6 +41,7 @@
 			</div>
 		</div>
 	</div>
+	</ng-container>
 
 	<div class="pagination">
 		<button (click)="goToPage(currentPage-1)" [disabled]="currentPage === 1">&lt;</button>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import Swal from 'sweetalert2';
 import { DeliveryService } from '../../../../core/services/delivery.service';
 import { CommonModule } from '@angular/common';
@@ -24,10 +24,12 @@ export class History implements OnInit {
   pageSize: number = 3;
   totalPages: number = 1;
   totalDeliveries: number = 0;
+  isLoading: boolean = false;
 
   constructor(
     private deliveryService: DeliveryService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -35,16 +37,27 @@ export class History implements OnInit {
   }
 
   fetchDeliveries(params?: any) {
+    this.isLoading = true;
     const currentUser = this.authService.getCurrentUser();
     const queryParams = { ...params, page: this.currentPage, pageSize: this.pageSize };
     if (currentUser && currentUser.id) {
       queryParams.client_id = currentUser.id;
     }
-    this.deliveryService.getDeliveryHistory(queryParams).subscribe((res: any) => {
-      this.deliveries = res.data || [];
-      this.totalDeliveries = res.total || 0;
-      this.totalPages = Math.max(1, Math.ceil(this.totalDeliveries / this.pageSize));
-      this.filteredDeliveries = this.deliveries;
+    this.deliveryService.getDeliveryHistory(queryParams).subscribe({
+      next: (res: any) => {
+        this.deliveries = res.data || [];
+        this.totalDeliveries = res.total || 0;
+        this.totalPages = Math.max(1, Math.ceil(this.totalDeliveries / this.pageSize));
+        this.filteredDeliveries = this.deliveries;
+        this.isLoading = false;
+        // Zoneless change detection: manually mark for check so the view updates on first click/HTTP response
+        this.cdr.markForCheck();
+      },
+      error: (err: any) => {
+        console.error('Failed to fetch deliveries', err);
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      }
     });
   }
 
@@ -102,6 +115,8 @@ export class History implements OnInit {
             delivery.status = 'cancelled';
             this.applyFilterAndPagination();
             Swal.fire('Cancelled!', 'The order has been cancelled successfully.', 'success');
+            // Ensure UI reflects the updated status immediately in zoneless mode
+            this.cdr.markForCheck();
           },
           error: (err: any) => {
             console.error('Cancel order failed', err);
