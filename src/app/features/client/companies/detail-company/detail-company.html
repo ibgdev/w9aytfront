@@ -1,0 +1,148 @@
+<app-navbar></app-navbar>
+
+<main class="detail-page">
+  @if (isLoading()) {
+    <div class="loading-container">
+      <div class="loading-spinner">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Loading company details...</p>
+      </div>
+    </div>
+  } @else if (error()) {
+    <div class="error-container">
+      <div class="error-card">
+        <i class="fas fa-exclamation-circle"></i>
+        <h2>{{ error() }}</h2>
+        <button (click)="goBack()" class="back-btn">
+         Back to Companies
+        </button>
+      </div>
+    </div>
+  } @else if (company()) {
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <button (click)="goBack()" class="back-button">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+        
+        <div class="company-header">
+          <div class="logo-wrapper">
+            @if (company()!.logo_url && !company()!.imageError) {
+              <img [src]="company()!.logo_url" [alt]="company()!.name" class="company-logo" (error)="company()!.imageError = true">
+            } @else {
+              <div class="placeholder-logo">{{ company()!.name.charAt(0) | uppercase }}</div>
+            }
+          </div>
+          <h1 class="company-title">{{ company()!.name }}</h1>
+          <div class="status-badge">
+            <i class="fas fa-check-circle"></i> Active Partner
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Company Details Section -->
+    <section class="details-section">
+      <div class="details-container">
+        
+        <!-- Contact Information Card -->
+        <div class="info-card">
+          <div class="card-header">
+            <i class="fas fa-address-card"></i>
+            <h2>Contact Information</h2>
+          </div>
+          <div class="card-body">
+            <div class="info-row">
+              <div class="info-icon">
+                <i class="fas fa-envelope"></i>
+              </div>
+              <div class="info-content">
+                <label>Email Address</label>
+                <a [href]="'mailto:' + company()!.email" class="info-value">{{ company()!.email }}</a>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="info-icon">
+                <i class="fas fa-phone"></i>
+              </div>
+              <div class="info-content">
+                <label>Phone Number</label>
+                <a [href]="'tel:' + company()!.phone" class="info-value">{{ company()!.phone }}</a>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="info-icon">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <div class="info-content">
+                <label>Address</label>
+                <p class="info-value">{{ company()!.address }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions Card -->
+        <div class="info-card actions-card">
+          <div class="card-header">
+            <i class="fas fa-bolt"></i>
+            <h2>Quick Actions</h2>
+          </div>
+          <div class="card-body">
+            <a [href]="'mailto:' + company()!.email" class="action-btn">
+              <i class="fas fa-envelope"></i>
+              <span>Send Email</span>
+            </a>
+            <a [href]="'tel:' + company()!.phone" class="action-btn">
+              <i class="fas fa-phone"></i>
+              <span>Call Now</span>
+            </a>
+            <button class="action-btn" (click)="goBack()">
+              <i class="fas fa-building"></i>
+              <span>View All Companies</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- About Card -->
+        <div class="info-card full-width">
+          <div class="card-header">
+            <i class="fas fa-info-circle"></i>
+            <h2>About {{ company()!.name }}</h2>
+          </div>
+          <div class="card-body">
+            <p class="about-text">
+              {{ company()!.name }} is a trusted delivery partner with W9aytDelivery. 
+              We work together to provide reliable and efficient delivery services to customers across the region.
+            </p>
+            <div class="features-grid">
+              <div class="feature-item">
+                <i class="fas fa-shipping-fast"></i>
+                <span>Fast Delivery</span>
+              </div>
+              <div class="feature-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Secure Service</span>
+              </div>
+              <div class="feature-item">
+                <i class="fas fa-clock"></i>
+                <span>24/7 Support</span>
+              </div>
+              <div class="feature-item">
+                <i class="fas fa-star"></i>
+                <span>Trusted Partner</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  }
+</main>
+
+<app-footer></app-footer>

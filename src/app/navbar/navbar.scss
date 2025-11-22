@@ -306,8 +306,17 @@ $font-family: 'Poppins', sans-serif;
         transform: scale(1.05);
       }
 
-      .profile-icon {
+      .profile-initials {
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
+        background-color: $secondary-color;
+        color: $white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1.2rem;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
     }
@@ -345,9 +354,12 @@ $font-family: 'Poppins', sans-serif;
         .profile-avatar {
           flex-shrink: 0;
 
-          svg {
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          .profile-initials {
+            &.large {
+              width: 56px;
+              height: 56px;
+              font-size: 1.5rem;
+            }
           }
         }
 

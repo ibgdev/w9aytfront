@@ -71,12 +71,9 @@
     <div class="profile-wrapper">
       <button class="profile-button" (click)="toggleProfile()" aria-label="Profile menu">
         <!-- Profile Icon -->
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-          class="profile-icon">
-          <circle cx="12" cy="12" r="11" fill="#e0e0e0" stroke="#666" stroke-width="1" />
-          <circle cx="12" cy="9" r="3.5" fill="#666" />
-          <path d="M5 19c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke="#666" stroke-width="2" stroke-linecap="round" />
-        </svg>
+        <div class="profile-initials">
+          {{ currentUser?.name?.charAt(0) | uppercase }}
+        </div>
       </button>
 
       <!-- Dropdown Menu -->
@@ -84,11 +81,9 @@
       <div class="profile-dropdown">
         <div class="profile-header">
           <div class="profile-avatar">
-            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="11" fill="#e0e0e0" />
-              <circle cx="12" cy="9" r="3.5" fill="#666" />
-              <path d="M5 19c0-3.5 3-5.5 7-5.5s7 2 7 5.5" stroke="#666" stroke-width="2" stroke-linecap="round" />
-            </svg>
+            <div class="profile-initials large">
+              {{ currentUser?.name?.charAt(0) | uppercase }}
+            </div>
           </div>
           <div class="profile-info">
             <div class="profile-name">{{ currentUser?.name || 'User' }}</div>

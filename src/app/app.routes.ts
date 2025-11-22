@@ -13,6 +13,8 @@ import { GestionCompany } from './features/admin/gestion-company.component/gesti
 import { ValidationDemandesComponent } from './features/admin/validation-demandes.component/validation-demandes.component';
 import { ContactMessagesComponent } from './features/admin/contact-messages.component/contact-messages.component';
 import { DashboardComponent } from './features/admin/dashboard.component/dashboard.component';
+import { Companies } from './features/client/companies/companies';
+import { DetailCompany } from './features/client/companies/detail-company/detail-company';
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
@@ -45,6 +47,14 @@ export const routes: Routes = [
       import('./features/authentication/verify-email/verify-email').then(
         (m) => m.VerifyEmailComponent
       ),
+  },
+  {
+    path: 'companies',
+    component: Companies,
+  },
+  {
+    path: 'companies/:id',
+    component: DetailCompany,
   },
   {
     path: 'profile',
