@@ -1,0 +1,293 @@
+// src/app/features/new-delivery/new-delivery.component.ts
+import { Component, AfterViewInit, OnDestroy, inject } from '@angular/core';
+import { FormControl, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, switchMap } from 'rxjs/operators';
+import * as L from 'leaflet';
+import { CommonModule } from '@angular/common';
+import { LocationService } from '../../../../core/services/location.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import Swal from 'sweetalert2';
+import { DeliveryService } from '../../../../core/services/delivery.service';
+import { Navbar } from '../../../../navbar/navbar';
+import { Footer } from '../../../../footer/footer';
+import { CompanyService } from '../../../../core/services/company.service';
+
+@Component({
+  selector: 'app-new-delivery',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, Navbar, Footer],
+  templateUrl: './new-delivery.html',
+  styleUrls: ['./new-delivery.scss'],
+})
+export class NewDeliveryComponent implements AfterViewInit, OnDestroy {
+  dropoffAddress = new FormControl('');
+  // full form for the page
+  form: FormGroup;
+  private authService: AuthService = inject(AuthService);
+  private map!: L.Map;
+  private marker?: L.Marker;
+  private locationService = inject(LocationService);
+  private deliveryService = inject(DeliveryService);
+  private subs = new Subscription();
+  companies: Array<{ id: number, name: string }> = [];
+  private companyService = inject(CompanyService);
+
+  // address status for UI hints: 'idle' | 'searching' | 'valid' | 'not-found' | 'too-short' | 'error'
+  addressStatus: string = 'idle';
+  addressMessage: string | null = null;
+
+  constructor() {
+    // Récupérer l'utilisateur connecté
+    const user = this.authService.getCurrentUser();
+    // build the form
+    this.dropoffAddress = new FormControl('', Validators.required);
+    this.form = new FormGroup({
+      fullName: new FormControl(user?.name || '', Validators.required),
+      phone: new FormControl(user?.phone || '', Validators.required),
+      email: new FormControl(user?.email || '', [Validators.required, Validators.email]),
+      company: new FormControl('', Validators.required),
+      pickupAddress: new FormControl('', Validators.required),
+      dropoffAddress: this.dropoffAddress,
+      packageWeight: new FormControl(null, [Validators.required, Validators.min(0)]),
+      packageSize: new FormControl('M', Validators.required),
+      paymentMethod: new FormControl('Cash on Delivery', Validators.required),
+    });
+    // Configuration explicite des icônes Leaflet pour Angular
+    const defaultIcon = L.icon({
+      iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
+      iconUrl: 'assets/leaflet/marker-icon.png',
+      shadowUrl: 'assets/leaflet/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41],
+    });
+
+    // Assigne cette icône par défaut à tous les Markers
+    (L.Marker as any).prototype.options.icon = defaultIcon;
+
+    console.log('Default Leaflet icon assigned:', defaultIcon);
+  }
+
+  ngAfterViewInit(): void {
+    this.initMap();
+
+    // Charger la liste des companies depuis le backend
+    this.companyService.getAllCompanies().subscribe({
+      next: (list) => {
+        this.companies = Array.isArray(list) ? list.map(c => ({ id: c.id || 0, name: c.name })) : [];
+      },
+      error: (err) => {
+        console.error('Erreur chargement companies', err);
+      }
+    });
+
+    // Lightweight status updater: only show "too-short" while typing,
+    // do not show "searching" until the user finishes (blur or Enter).
+    this.subs.add(
+      this.dropoffAddress.valueChanges.pipe(debounceTime(200), distinctUntilChanged()).subscribe((v: any) => {
+        const s = v ? String(v).trim() : '';
+        if (!s) {
+          this.addressStatus = 'idle';
+          this.addressMessage = null;
+        } else if (s.length <= 3) {
+          this.addressStatus = 'too-short';
+          this.addressMessage = 'Veuillez saisir au moins 4 caractères pour lancer la recherche.';
+        } else {
+          // ready to search on blur/enter, but don't start searching automatically
+          this.addressStatus = 'idle';
+          this.addressMessage = null;
+        }
+      })
+    );
+  }
+
+  // Called when the input loses focus
+  onAddressBlur() {
+    const addr = String(this.dropoffAddress.value || '').trim();
+    if (addr.length > 3) {
+      this.performAddressSearch(addr);
+    }
+  }
+
+  // Called on Enter key press
+  onAddressEnter(e: Event) {
+    e.preventDefault();
+    const addr = String(this.dropoffAddress.value || '').trim();
+    if (addr.length > 3) {
+      this.performAddressSearch(addr);
+    }
+  }
+
+  private performAddressSearch(addr: string) {
+    this.addressStatus = 'searching';
+    this.addressMessage = 'Recherche de l\'adresse...';
+
+    this.locationService.forwardGeocode(addr).subscribe({
+      next: (res) => {
+        const coords = res?.coordinates;
+        let lat: number | undefined;
+        let lon: number | undefined;
+
+        if (coords && coords.lat && coords.lon) {
+          lat = coords.lat;
+          lon = coords.lon;
+        } else if (res?.features && res.features.length > 0) {
+          const first = res.features[0];
+          const gcoords = first.geometry && first.geometry.coordinates;
+          if (gcoords && gcoords.length >= 2) {
+            lon = gcoords[0];
+            lat = gcoords[1];
+          }
+        } else if (res?.raw && res.raw.geometry && res.raw.geometry.coordinates) {
+          const g = res.raw.geometry.coordinates;
+          lon = g[0];
+          lat = g[1];
+        }
+
+        if (lat !== undefined && lon !== undefined) {
+          this.placeMarker(lat, lon);
+          this.addressStatus = 'valid';
+          this.addressMessage = 'Adresse trouvée.';
+        } else {
+          this.addressStatus = 'not-found';
+          this.addressMessage = 'Aucun résultat trouvé pour cette adresse.';
+        }
+      },
+      error: (err) => {
+        console.error('Forward geocode error', err);
+        // don't set a harsh error while the user is typing; show friendly message
+        this.addressStatus = 'error';
+        this.addressMessage = 'Erreur lors de la recherche de l\'adresse. Veuillez réessayer.';
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.map) {
+      this.map.off();
+      this.map.remove();
+    }
+    // unsubscribe all address-related subscriptions
+    if (this.subs) {
+      this.subs.unsubscribe();
+    }
+  }
+
+  private initMap() {
+    const defaultLat = 34.0;
+    const defaultLon = 9.0;
+    const defaultZoom = 6;
+
+    this.map = L.map('map', { center: [defaultLat, defaultLon], zoom: defaultZoom });
+
+    // Use the OpenStreetMap France tile server which tends to show localized labels for French
+    // and provides a French-friendly style. This gives a more 'French' map experience.
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap France contributors'
+    }).addTo(this.map);
+
+    this.map.on('click', (e: L.LeafletMouseEvent) => {
+      const { lat, lng } = e.latlng;
+      this.placeMarker(lat, lng);
+      this.reverseGeocodeAndFill(lat, lng);
+    });
+  }
+
+  private placeMarker(lat: number, lon: number) {
+    if (this.marker) {
+      this.marker.setLatLng([lat, lon]);
+    } else {
+      this.marker = L.marker([lat, lon]).addTo(this.map);
+    }
+    this.map.setView([lat, lon], 14);
+  }
+
+  private reverseGeocodeAndFill(lat: number, lon: number) {
+    this.locationService.reverseGeocode(lat, lon).subscribe({
+      next: (res) => {
+        const address = res?.address ?? res?.features?.[0]?.properties?.formatted ?? '';
+        this.form.get('dropoffAddress')?.setValue(address);
+      },
+      error: (err) => {
+        console.error('Erreur reverse geocode', err);
+      }
+    });
+  }
+
+  computePrice(): number {
+    const base = 5; // base price
+    const sizeRate = this.form.get('packageSize')?.value === 'S' ? 3 : this.form.get('packageSize')?.value === 'M' ? 5 : 7;
+    const weight = Number(this.form.get('packageWeight')?.value) || 0;
+    const weightRate = weight * 1.2;
+    const price = base + sizeRate + weightRate;
+    return Math.round(price * 100) / 100;
+  }
+
+  onSubmit() {
+    // Vérification spécifique pour le champ company
+    if (!this.form.value.company) {
+      this.form.markAllAsTouched();
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Company',
+        text: 'Please select a company before submitting your delivery.'
+      });
+      return;
+    }
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    const user = this.authService.getCurrentUser();
+    const payload = {
+      ...this.form.value,
+      price: this.computePrice(),
+      currency: 'TND',
+      status: 'pending',
+      client_id: user?.id,
+      company_id: this.form.value.company,
+      payment_method: this.form.value.paymentMethod,
+    };
+
+    this.deliveryService.createDelivery(payload).subscribe({
+      next: (res) => {
+        if (res.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Delivery created!',
+            text: 'Your delivery has been saved successfully.',
+            confirmButtonText: 'OK'
+          });
+          const user = this.authService.getCurrentUser();
+          this.form.reset({
+            fullName: user?.name || '',
+            phone: user?.phone || '',
+            email: user?.email || '',
+            company: '',
+            pickupAddress: '',
+            dropoffAddress: '',
+            packageWeight: null,
+            packageSize: 'M',
+            paymentMethod: 'Cash on Delivery',
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Erreur lors de l\'enregistrement.'
+          });
+        }
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Server Error',
+          text: 'Erreur serveur: ' + (err?.error?.error || err.message)
+        });
+      }
+    });
+  }
+}

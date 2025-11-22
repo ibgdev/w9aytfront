@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // Colors
 $primary-color: #253e6b;
 $secondary-color: #e77a28;
@@ -102,7 +104,7 @@ $font-family: 'Poppins', sans-serif;
     box-shadow: 0 4px 12px rgba($secondary-color, 0.3);
 
     &:hover {
-      background-color: darken($secondary-color, 10%);
+  background-color: color.adjust($secondary-color, $lightness: -10%);
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba($secondary-color, 0.4);
     }
@@ -170,7 +172,7 @@ $font-family: 'Poppins', sans-serif;
       box-shadow: 0 4px 12px rgba($secondary-color, 0.3);
 
       &:hover {
-        background-color: darken($secondary-color, 10%);
+  background-color: color.adjust($secondary-color, $lightness: -10%);
         transform: translateY(-2px);
         box-shadow: 0 6px 16px rgba($secondary-color, 0.4);
       }

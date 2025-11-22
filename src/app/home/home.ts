@@ -7,10 +7,12 @@ import { HowItWorks } from "./how-it-works/how-it-works";
 import { ContactUs } from "./contact-us/contact-us";
 import { AuthService } from '../core/services/auth.service';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { KpiComponent } from '../kpi/kpi';
 
 @Component({
   selector: 'app-home',
-  imports: [Navbar, Footer, Hero, Solutions, HowItWorks, ContactUs],
+  imports: [Navbar, Footer, Hero, Solutions, HowItWorks, ContactUs,CommonModule, KpiComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
