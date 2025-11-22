@@ -4,9 +4,10 @@
   <!-- Your main content will go here -->
   <div class="content-wrapper">
     <app-hero></app-hero>
-    
-    <app-kpi *ngIf="isloggedIn()"></app-kpi>
-      <app-contact-us></app-contact-us>
+    @if (isloggedIn()) {
+      <app-kpi></app-kpi>
+        <app-contact-us></app-contact-us>
+    }
 
     <ng-container *ngIf="!isloggedIn()">
       <app-solutions></app-solutions>
