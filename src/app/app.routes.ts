@@ -15,6 +15,8 @@ import { ContactMessagesComponent } from './features/admin/contact-messages.comp
 import { DashboardComponent } from './features/admin/dashboard.component/dashboard.component';
 import { NewDeliveryComponent } from './features/client/delivery/new-delivery/new-delivery';
 
+import { Companies } from './features/client/companies/companies';
+import { DetailCompany } from './features/client/companies/detail-company/detail-company';
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
@@ -47,6 +49,14 @@ export const routes: Routes = [
       import('./features/authentication/verify-email/verify-email').then(
         (m) => m.VerifyEmailComponent
       ),
+  },
+  {
+    path: 'companies',
+    component: Companies,
+  },
+  {
+    path: 'companies/:id',
+    component: DetailCompany,
   },
   {
     path: 'profile',

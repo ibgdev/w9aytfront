@@ -1,0 +1,74 @@
+<app-navbar></app-navbar>
+
+<main class="companies-page">
+  <section class="hero-section">
+    <h1>All Companies</h1>
+    <div class="divider"></div>
+    <p>Here you can find all the companies that are partners with <span class="highlight">W9aytDelivery</span>.</p>
+  </section>
+
+  <section class="companies-grid-container">
+    @if (isLoading()) {
+      <div class="loading-spinner">
+        <i class="fas fa-spinner fa-spin"></i> Loading companies...
+      </div>
+    } @else {
+      <div class="companies-grid">
+        @for (company of paginatedCompanies(); track company.id) {
+          <div class="company-card">
+            <div class="card-header">
+              <div class="logo-container">
+                @if (company.logo_url && !company.imageError) {
+                  <img [src]="company.logo_url" [alt]="company.name" class="company-logo" (error)="company.imageError = true">
+                } @else {
+                  <div class="placeholder-logo">{{ company.name.charAt(0) | uppercase }}</div>
+                }
+              </div>
+            </div>
+            <div class="card-body">
+              <h2 class="company-name">{{ company.name }}</h2>
+              <div class="company-details">
+                <div class="info-item">
+                  <i class="fas fa-envelope"></i>
+                  <span>{{ company.email }}</span>
+                </div>
+                <div class="info-item">
+                  <i class="fas fa-phone"></i>
+                  <span>{{ company.phone }}</span>
+                </div>
+                <div class="info-item">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>{{ company.address }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <a [routerLink]="['/companies', company.id]" class="view-details-btn">
+                View Details
+                <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Pagination -->
+      @if (totalPages() > 1) {
+        <div class="pagination">
+          <span class="page-info">page {{ currentPage() }} of {{ totalPages() }}</span>
+          <div class="page-controls">
+            @for (page of pages(); track page) {
+              <button 
+                [class.active]="page === currentPage()" 
+                (click)="changePage(page)">
+                {{ page }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    }
+  </section>
+</main>
+
+<app-footer></app-footer>
