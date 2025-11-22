@@ -20,6 +20,10 @@ export class Home implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
 
+  isloggedIn(): boolean {
+    return this.auth.isLoggedIn();
+  }
+
   ngOnInit(): void {
     const user = this.auth.getCurrentUser();
     if (user?.role == 'client') {
