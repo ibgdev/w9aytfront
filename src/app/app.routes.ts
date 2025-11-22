@@ -13,6 +13,8 @@ import { GestionCompany } from './features/admin/gestion-company.component/gesti
 import { ValidationDemandesComponent } from './features/admin/validation-demandes.component/validation-demandes.component';
 import { ContactMessagesComponent } from './features/admin/contact-messages.component/contact-messages.component';
 import { DashboardComponent } from './features/admin/dashboard.component/dashboard.component';
+import { NewDeliveryComponent } from './features/client/delivery/new-delivery/new-delivery';
+
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
@@ -71,8 +73,12 @@ export const routes: Routes = [
     component: ContactMessagesComponent,
   },
 
-  {
-    path: '**',
-    component: Notfound,
+
+   {
+    path: 'new-delivery',
+    component: NewDeliveryComponent
+  },
+  { 
+    path: '**', component: Notfound
   },
 ];

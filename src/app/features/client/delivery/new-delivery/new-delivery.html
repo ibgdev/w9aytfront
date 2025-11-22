@@ -1,0 +1,179 @@
+<!-- src/app/features/new-delivery/new-delivery.component.html -->
+<app-navbar></app-navbar>
+
+<div class="page-wrapper">
+  <!-- Header Section (Blue banner) -->
+  <div class="header-section">
+    <h1>Add a New Delivery</h1>
+    <div class="header-divider"></div>
+    <p class="header-subtitle">Pick a partner, drop your location, and let <strong>W9ayetDelivery</strong> handle the rest! 🚚</p>
+  </div>
+
+  <!-- Main Content -->
+  <div class="new-delivery-container">
+    <!-- Form Column -->
+    <div class="form-column">
+      <form [formGroup]="form" class="delivery-form" (ngSubmit)="onSubmit()">
+       
+        <!-- Full Name and Phone Row -->
+        <div class="row two-cols">
+          <div class="col">
+            <label for="fullName">Full Name</label>
+            <input 
+              id="fullName"
+              type="text" 
+              formControlName="fullName" 
+              placeholder="Your Full name" 
+            />
+          </div>
+          <div class="col">
+            <label for="phone">Phone</label>
+            <input 
+              id="phone"
+              type="text" 
+              formControlName="phone" 
+              placeholder="+216 21 000 000" 
+            />
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label for="email">Email</label>
+          <input 
+            id="email"
+            type="email" 
+            formControlName="email" 
+            placeholder="youremail@domain.com" 
+          />
+        </div>
+
+        <!-- Company -->
+        <div>
+          <label for="company">Company</label>
+          <select id="company" formControlName="company">
+            <option value="">Choose a company</option>
+            <option *ngFor="let c of companies" [value]="c.id">{{ c.name }}</option>
+          </select>
+        </div>
+
+        <!-- Pick up location -->
+        <div>
+          <label for="pickupAddress">Pick up location</label>
+          <input 
+            id="pickupAddress"
+            type="text" 
+            formControlName="pickupAddress" 
+            placeholder="Street, city, country" 
+          />
+        </div>
+
+        <!-- Drop off address -->
+        <div>
+          <label for="dropoff">Drop off address</label>
+          <input 
+            id="dropoff"
+            type="text" 
+            formControlName="dropoffAddress" 
+            placeholder="Point at delivery location in the map" 
+            aria-describedby="addr-hint"
+          />
+          <div id="addr-hint" class="address-hint" *ngIf="addressStatus !== 'idle'">
+            <span *ngIf="addressStatus === 'too-short'" class="hint error">
+              {{ addressMessage }}
+            </span>
+            <span *ngIf="addressStatus === 'searching'" class="hint info">
+              {{ addressMessage }}
+            </span>
+            <span *ngIf="addressStatus === 'not-found'" class="hint error">
+              {{ addressMessage }}
+            </span>
+            <span *ngIf="addressStatus === 'error'" class="hint error">
+              {{ addressMessage }}
+            </span>
+            <span *ngIf="addressStatus === 'valid'" class="hint success">
+              {{ addressMessage }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Package weight -->
+        <div>
+          <label for="packageWeight">Package weight</label>
+          <input 
+            id="packageWeight"
+            type="number" 
+            formControlName="packageWeight" 
+            placeholder="Weight in KG" 
+          />
+        </div>
+
+        <!-- Package Size -->
+        <div>
+          <label for="packageSize">Package Size</label>
+          <select id="packageSize" formControlName="packageSize">
+            <option value="S">Small (S) - 3 DT</option>
+            <option value="M">Medium (M) - 5 DT</option>
+            <option value="L">Large (L) - 7 DT</option>
+          </select>
+        </div>
+        <!-- Payment Method -->
+        <div>
+          <label for="paymentMethod">Payment Method</label>
+          <select id="paymentMethod" formControlName="paymentMethod">
+            <option value="Cash on Delivery">Cash on Delivery</option>
+          </select>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="actions">
+          <button 
+            type="submit" 
+            class="btn-primary"
+            [disabled]="!form.valid"
+          >
+            Deliver now
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Map Column -->
+    <div class="map-column">
+      <h3>Choose Delivery location</h3>
+      <div id="map" class="map"></div>
+      <div class="price-box">
+        Price : <span>{{ computePrice() }}</span> TND
+      </div>
+    </div>
+  </div>
+
+  <!-- Pricing Section -->
+  <div class="pricing-section">
+    <h2>Delivery Pricing</h2>
+    <p>We calculate your delivery cost based on a simple and transparent formula:</p>
+    <p class="formula">
+      <strong>Total Price = Base Price + Size Rate + (Weight × 1.2 DT)</strong>
+    </p>
+    <div class="pricing-details">
+      <ul>
+        <li>
+          <strong>Base price:</strong> 5 DT
+        </li>
+        <li>
+          <strong>Package size:</strong>
+          <ul>
+            <li><strong>Small (S):</strong> +3 DT</li>
+            <li><strong>Medium (M):</strong> +5 DT</li>
+            <li><strong>Large (L):</strong> +7 DT</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Weight:</strong> +1.2 DT per kilogram
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

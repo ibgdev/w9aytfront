@@ -1,0 +1,42 @@
+<div class="stats-container">
+  <!-- Show errors only; KPI cards appear only when stats are available -->
+  <div *ngIf="error" class="stat-error">Error loading KPI: {{ error }}</div>
+
+  <!-- Only show KPI cards once we have data to avoid flicker or incorrect totals -->
+  <ng-container *ngIf="lastResponse?.stats; else noData">
+
+  <div class="stat-card stat-deliveries">
+    <div class="stat-icon">
+      <i class="fas fa-box"></i>
+    </div>
+    <div class="stat-info">
+      <div class="stat-number">{{ totalDeliveries }}</div>
+      <div class="stat-label">Total Deliveries</div>
+    </div>
+  </div>
+
+  <div class="stat-card stat-transit">
+    <div class="stat-icon">
+      <i class="fas fa-truck"></i>
+    </div>
+    <div class="stat-info">
+      <div class="stat-number">{{ inTransit }}</div>
+      <div class="stat-label">In Transit</div>
+    </div>
+  </div>
+
+  <div class="stat-card stat-delivered">
+    <div class="stat-icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <div class="stat-info">
+      <div class="stat-number">{{ delivered }}</div>
+      <div class="stat-label">Delivered</div>
+    </div>
+  </div>
+  </ng-container>
+</div>
+
+<ng-template #noData>
+  <div class="stat-no-data">No KPI data available</div>
+</ng-template>
