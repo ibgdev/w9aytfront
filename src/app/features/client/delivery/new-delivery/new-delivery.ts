@@ -1,5 +1,5 @@
 // src/app/features/new-delivery/new-delivery.component.ts
-import { Component, AfterViewInit, OnDestroy, inject } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, inject, OnInit, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, switchMap } from 'rxjs/operators';
@@ -11,7 +11,7 @@ import Swal from 'sweetalert2';
 import { DeliveryService } from '../../../../core/services/delivery.service';
 import { Navbar } from '../../../../navbar/navbar';
 import { Footer } from '../../../../footer/footer';
-import { CompanyService } from '../../../../core/services/company.service';
+import { AllCompaniesService, PublicCompany } from '../../../../core/services/all-companies.service';
 
 @Component({
   selector: 'app-new-delivery',
@@ -20,7 +20,7 @@ import { CompanyService } from '../../../../core/services/company.service';
   templateUrl: './new-delivery.html',
   styleUrls: ['./new-delivery.scss'],
 })
-export class NewDeliveryComponent implements AfterViewInit, OnDestroy {
+export class NewDeliveryComponent implements AfterViewInit, OnDestroy,OnInit {
   dropoffAddress = new FormControl('');
   // full form for the page
   form: FormGroup;
@@ -30,8 +30,8 @@ export class NewDeliveryComponent implements AfterViewInit, OnDestroy {
   private locationService = inject(LocationService);
   private deliveryService = inject(DeliveryService);
   private subs = new Subscription();
-  companies: Array<{ id: number, name: string }> = [];
-  private companyService = inject(CompanyService);
+  companies = signal<PublicCompany[]>([]);
+  private allCompaniesService = inject(AllCompaniesService);
 
   // address status for UI hints: 'idle' | 'searching' | 'valid' | 'not-found' | 'too-short' | 'error'
   addressStatus: string = 'idle';
@@ -69,19 +69,15 @@ export class NewDeliveryComponent implements AfterViewInit, OnDestroy {
 
     console.log('Default Leaflet icon assigned:', defaultIcon);
   }
+  ngOnInit(): void {
+    this.getCompanies();
+  }
 
   ngAfterViewInit(): void {
     this.initMap();
 
     // Charger la liste des companies depuis le backend
-    this.companyService.getAllCompanies().subscribe({
-      next: (list) => {
-        this.companies = Array.isArray(list) ? list.map(c => ({ id: c.id || 0, name: c.name })) : [];
-      },
-      error: (err) => {
-        console.error('Erreur chargement companies', err);
-      }
-    });
+
 
     // Lightweight status updater: only show "too-short" while typing,
     // do not show "searching" until the user finishes (blur or Enter).
@@ -103,6 +99,16 @@ export class NewDeliveryComponent implements AfterViewInit, OnDestroy {
     );
   }
 
+  getCompanies(){
+    this.allCompaniesService.getAllCompanies().subscribe({
+      next: (data) => {
+        this.companies.set(data);
+      },
+      error: (err) => {
+        console.error('Error loading companies', err);
+      },
+    });
+  }
   // Called when the input loses focus
   onAddressBlur() {
     const addr = String(this.dropoffAddress.value || '').trim();
