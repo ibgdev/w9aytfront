@@ -26,10 +26,6 @@ export class Home implements OnInit {
 
   ngOnInit(): void {
     const user = this.auth.getCurrentUser();
-    if (user?.role == 'client') {
-      // this.router.navigateByUrl('/home');
-      // return;
-    }
     if (user?.role == 'admin') {
       this.router.navigateByUrl('/admin');
       return;
