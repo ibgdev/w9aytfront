@@ -3,15 +3,17 @@ import Swal from 'sweetalert2';
 import { DeliveryService } from '../../../../core/services/delivery.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { Navbar } from '../../../../navbar/navbar';
 import { Footer } from '../../../../footer/footer';
 import { ContactUs } from '../../../../home/contact-us/contact-us';
 import { AuthService } from '../../../../core/services/auth.service';
+import { ChatService } from '../../../../core/services/chat.service';
 
 
 @Component({
   selector: 'app-history',
-  imports: [CommonModule, FormsModule, Navbar, Footer,ContactUs],
+  imports: [CommonModule, FormsModule, RouterModule, Navbar, Footer,ContactUs],
   templateUrl: './history.html',
   styleUrl: './history.scss',
 })
@@ -29,6 +31,8 @@ export class History implements OnInit {
   constructor(
     private deliveryService: DeliveryService,
     private authService: AuthService,
+    private chatService: ChatService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -135,5 +139,26 @@ export class History implements OnInit {
   if (page < 1 || page > this.totalPages) return;
   this.currentPage = page;
   this.fetchDeliveries({ q: this.searchTerm?.trim(), status: this.selectedStatus });
+  }
+
+  openChat(delivery: any) {
+    if (!delivery || !delivery.id) return;
+    if (!delivery.driver_name) {
+      Swal.fire('No Driver', 'This delivery does not have an assigned driver yet.', 'info');
+      return;
+    }
+
+    // Créer ou récupérer la conversation
+    this.chatService.createOrGetConversation(delivery.id).subscribe({
+      next: (res: any) => {
+        if (res.success && res.conversation) {
+          this.router.navigate(['/chat', res.conversation.id]);
+        }
+      },
+      error: (err: any) => {
+        console.error('Error creating conversation:', err);
+        Swal.fire('Error', 'Failed to open chat. Please try again.', 'error');
+      }
+    });
   }
 }

@@ -1,0 +1,75 @@
+<app-navbar></app-navbar>
+<div class="chat-container">
+  <div class="chat-header">
+    <button class="back-btn" (click)="router.navigate(['/chat'])">Back to Conversations</button>
+    <h2>{{ conversation?.subject || 'Chat' }}</h2>
+    <p *ngIf="conversation" class="chat-with">
+      <span>With: {{ getOtherUserName() }}</span>
+      <span *ngIf="otherUserOnline" class="online-indicator" title="Online">
+        <span class="online-dot"></span>
+        <span class="online-text">Online</span>
+      </span>
+      <span *ngIf="!otherUserOnline" class="offline-indicator" title="Offline">
+        <span class="offline-dot"></span>
+        <span class="offline-text">Offline</span>
+      </span>
+    </p>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Loading conversation...</div>
+
+  <div *ngIf="!isLoading" class="chat-content">
+    <div class="messages-container" #messagesContainer>
+      <div *ngFor="let message of messages" class="message" [ngClass]="{ 'my-message': isMyMessage(message) }">
+        <div class="message-content">
+          <div class="message-header">
+            <span class="sender-name">{{ message.sender_name }}</span>
+            <span class="message-time">{{ formatDate(message.created_at) }}</span>
+          </div>
+          <p *ngIf="message.text" class="message-text">{{ message.text }}</p>
+          <div *ngIf="message.attachment_url" class="message-attachment">
+            <div class="attachment-preview">
+              <span class="attachment-icon">📎</span>
+              <span class="attachment-name">{{ getFileName(message.attachment_url) }}</span>
+              <button class="download-btn" (click)="downloadFile(message.attachment_url)">Download</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="message-input-container">
+      <div *ngIf="selectedFile" class="selected-file">
+        <span>{{ selectedFile.name }}</span>
+        <button class="remove-file-btn" (click)="removeSelectedFile()">×</button>
+      </div>
+      <div class="input-group">
+        <input
+          type="file"
+          #fileInput
+          (change)="onFileSelected($event)"
+          class="file-input"
+          accept="*/*"
+        />
+        <button class="file-btn" (click)="fileInput.click()">📎</button>
+        <input
+          type="text"
+          [(ngModel)]="newMessage"
+          (keyup.enter)="sendMessage()"
+          placeholder="Type a message..."
+          class="message-input"
+          [disabled]="isSending"
+        />
+        <button
+          class="send-btn"
+          (click)="sendMessage()"
+          [disabled]="isSending || (!newMessage.trim() && !selectedFile)"
+        >
+          {{ isSending ? 'Sending...' : 'Send' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<app-footer></app-footer>
+

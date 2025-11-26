@@ -9,6 +9,8 @@ import { Notfound } from './notfound/notfound';
 import { Profile } from './features/client/profile/profile';
 import { NewDeliveryComponent } from './features/client/delivery/new-delivery/new-delivery';
 import { History } from './features/client/delivery/history/history';
+import { ConversationsList } from './features/client/chat/conversations-list/conversations-list';
+import { Chat } from './features/client/chat/chat/chat';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -47,9 +49,17 @@ export const routes: Routes = [
    {
     path: 'new-delivery',
     component: NewDeliveryComponent
-  }, {
+  },    {
     path: 'history',
     component: History
+  },
+  {
+    path: 'chat',
+    component: ConversationsList
+  },
+  {
+    path: 'chat/:id',
+    component: Chat
   },
   { 
     path: '**', component: Notfound

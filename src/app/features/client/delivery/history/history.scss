@@ -98,6 +98,14 @@ $radius-xl: 20px;
   gap: 40px;
   margin-top: 20px;
 
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
   h2 {
     font-size: 36px;
     font-weight: 800;
@@ -115,6 +123,25 @@ $radius-xl: 20px;
       height: 32px;
       background: linear-gradient(180deg, $primary-color, $third-color);
       border-radius: 3px;
+    }
+  }
+
+  .chat-link {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, $third-color, rgba($third-color, 0.8));
+    color: white;
+    text-decoration: none;
+    border-radius: $radius;
+    font-weight: 600;
+    font-size: 14px;
+    transition: $transition-fast;
+    box-shadow: 0 4px 12px rgba($third-color, 0.2);
+    white-space: nowrap;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba($third-color, 0.3);
+      background: linear-gradient(135deg, rgba($third-color, 0.9), $third-color);
     }
   }
 }
@@ -525,6 +552,13 @@ $radius-xl: 20px;
   }
 }
 
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 .cancel-btn {
   padding: 10px 20px;
   background: linear-gradient(135deg, $secondary-color, rgba($secondary-color, 0.8));
@@ -543,6 +577,31 @@ $radius-xl: 20px;
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba($secondary-color, 0.3);
     background: linear-gradient(135deg, rgba($secondary-color, 0.9), $secondary-color);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.chat-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, $third-color, rgba($third-color, 0.8));
+  color: white;
+  border: none;
+  border-radius: $radius;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: $transition-fast;
+  box-shadow: 0 4px 12px rgba($third-color, 0.2);
+  width: fit-content;
+  white-space: nowrap;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba($third-color, 0.3);
+    background: linear-gradient(135deg, rgba($third-color, 0.9), $third-color);
   }
 
   &:active {
