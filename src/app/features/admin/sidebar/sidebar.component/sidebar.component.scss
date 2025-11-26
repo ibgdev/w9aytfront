@@ -88,10 +88,11 @@
   transition: transform 0.3s ease;
 }
 
+
 .menu-item:hover {
-  background: rgba(231, 122, 40, 0.1);
-  color: white;
-  border-color: rgba(231, 122, 40, 0.3);
+  background: #1e2a5e;
+  color: #fff;
+  border-color: #1e2a5e;
   transform: translateX(3px);
 }
 
@@ -103,11 +104,12 @@
   transform: scaleY(1);
 }
 
+
 .menu-item.active {
-  background: rgba(231, 122, 40, 0.15);
-  color: white;
+  background: #1e2a5e;
+  color: #fff;
   font-weight: 500;
-  border-color: rgba(231, 122, 40, 0.4);
+  border-color: #1e2a5e;
 }
 
 .menu-item.active .icon {
