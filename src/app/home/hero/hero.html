@@ -42,8 +42,8 @@
           <p class="hero-tagline">the smart way to move what matters.</p>
         </div>
         <div class="hero-buttons">
-          <button class="btn-primary" routerLink="/get-started">Get Started</button>
-          <button class="btn-secondary" routerLink="/how-it-works">How It Works</button>
+          <button class="btn-primary" [routerLink]="['/login']">Get Started</button>
+          <button class="btn-secondary" (click)="scrollToSection('how-it-works')" >How It Works</button>
         </div>
       </div>
 
