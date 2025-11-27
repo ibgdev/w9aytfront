@@ -55,8 +55,8 @@
               <span class="delivery-status" *ngIf="conv.delivery_status" [style.color]="getDeliveryStatusColor(conv)">
                 📦 {{ getDeliveryStatus(conv) }}
               </span>
-              <span class="delivery-address" *ngIf="conv.pickup_address" title="{{ conv.pickup_address }}">
-                📍 {{ (conv.pickup_address.length > 25 ? (conv.pickup_address.substring(0, 25) + '...') : conv.pickup_address) }}
+              <span class="delivery-address" *ngIf="conv.pickup_address" title="{{ conv.dropoff_address }}">
+                📍 {{ (conv.dropoff_address.length > 25 ? (conv.dropoff_address.substring(0, 25) + '...') : conv.dropoff_address) }}
               </span>
             </div>
             <div class="conversation-message-row">
@@ -104,12 +104,12 @@
               last seen {{ getLastSeenTime() }}
             </p>
             <!-- Delivery Info in Header -->
-            <div class="delivery-info-header" *ngIf="conversation && (conversation.delivery_status || conversation.pickup_address)">
+            <div class="delivery-info-header" *ngIf="conversation && (conversation.delivery_status || conversation.dropoff_address)">
               <span class="delivery-status-badge" *ngIf="conversation.delivery_status" [style.background-color]="getDeliveryStatusColor(conversation) + '20'" [style.color]="getDeliveryStatusColor(conversation)">
                 📦 {{ getDeliveryStatus(conversation) }}
               </span>
-              <span class="delivery-address-info" *ngIf="conversation.pickup_address" [title]="conversation.pickup_address">
-                📍 {{ conversation.pickup_address.length > 30 ? (conversation.pickup_address.substring(0, 30) + '...') : conversation.pickup_address }}
+              <span class="delivery-address-info" *ngIf="conversation.dropoff_address" [title]="conversation.dropoff_address">
+                📍 {{ conversation.dropoff_address.length > 30 ? (conversation.dropoff_address.substring(0, 30) + '...') : conversation.dropoff_address }}
               </span>
             </div>
           </div>
