@@ -41,7 +41,7 @@ export class CompanySignup implements OnInit {
           '',
           [
             Validators.required,
-            Validators.pattern(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/),
+            Validators.pattern(/^\d{8}$/),
           ],
         ],
         email: ['', [Validators.required, Validators.email]],

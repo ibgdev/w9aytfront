@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService, User } from '../../../core/services/user.service';
-import { CompanyService, Company } from '../../../core/services/company.service';
+import { Company } from '../../../core/services/company.service';
+import { AllCompaniesService } from '../../../core/services/all-companies.service';
 import { SidebarComponent } from '../sidebar/sidebar.component/sidebar.component';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -19,7 +20,7 @@ export class ValidationDemandesComponent implements OnInit {
   users: User[] = [];
   isLoading = false;
   showCompanyDetails = false;
-  selectedCompany: Company | null = null;
+  selectedCompany: import('../../../core/services/all-companies.service').PublicCompany | null = null;
   
   // Alert system
   alertMessage = signal('');
@@ -30,8 +31,8 @@ export class ValidationDemandesComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private companyService: CompanyService,
-    private cdr: ChangeDetectorRef // ✅ Ajouté
+    private allCompaniesService: AllCompaniesService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -112,13 +113,13 @@ export class ValidationDemandesComponent implements OnInit {
   // View company details
   viewCompanyDetails(user: User): void {
     if (!user.id) return;
-    
-    // Fetch all companies and find the one associated with this user
-    this.companyService.getAllCompanies().subscribe({
-      next: (companies) => {
-        const company = companies.find(c => c.user_id === user.id);
-        if (company) {
-          this.selectedCompany = company;
+    // Fetch company by user_id directly
+    this.allCompaniesService.getCompanyByUserId(user.id).subscribe({
+      next: (company) => {
+        console.log('Fetched company details:', company);
+        const companyObj = Array.isArray(company) ? company[0] : company;
+        if (companyObj) {
+          this.selectedCompany = companyObj;
           this.showCompanyDetails = true;
           this.cdr.detectChanges();
         } else {
@@ -126,7 +127,6 @@ export class ValidationDemandesComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('Error loading company:', error);
         alert('Error loading company details');
       }
     });
