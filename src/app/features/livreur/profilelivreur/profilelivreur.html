@@ -1,0 +1,124 @@
+<div class="profile-container">
+  <app-sidebar></app-sidebar>
+
+  <div class="profile-content">
+    <div class="profile-card">
+      <h1 class="title">Profile Settings</h1>
+
+      <div class="profile-layout">
+        <div class="form-section">
+          <form [formGroup]="profileForm" (ngSubmit)="onSaveChanges()">
+
+            <!-- NAME -->
+            <div class="form-group">
+              <label for="name">Your Name</label>
+              <input 
+                type="text" 
+                id="name" 
+                formControlName="name"
+                class="form-input"
+                placeholder="Enter your name"
+              />
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input 
+                type="password" 
+                id="password" 
+                formControlName="password"
+                class="form-input"
+                placeholder="Enter new password"
+              />
+            </div>
+
+            <!-- CONFIRM PASSWORD : vérification ici -->
+            <div class="form-group">
+              <label for="confirmPassword">Confirm Password</label>
+              <input 
+                type="password" 
+                id="confirmPassword" 
+                formControlName="confirmPassword"
+                class="form-input"
+                [class.error]="profileForm.hasError('passwordMismatch') 
+                                && profileForm.get('confirmPassword')?.touched"
+                placeholder="Confirm your password"
+              />
+              <div style="color: red;" *ngIf="!passwordsMatch()">
+  Passwords do not match.
+</div>
+
+              
+            </div>
+
+            <!-- EMAIL READONLY -->
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input 
+                type="email" 
+                id="email" 
+                formControlName="email"
+                class="form-input readonly"
+                placeholder="Email address"
+                readonly
+              />
+            </div>
+
+            <!-- PHONE -->
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input
+                type="text"
+                id="phone"
+                formControlName="phone"
+                class="form-input"
+                placeholder="Enter your phone number"
+              />
+            </div>
+
+            <!-- ADDRESS -->
+            <div class="form-group">
+              <label for="address">Address</label>
+              <textarea 
+                id="address" 
+                formControlName="address"
+                class="form-input"
+                placeholder="Enter your address"
+                rows="3"
+              ></textarea>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- RIGHT SECTION -->
+        <div class="profile-section">
+          <div class="avatar">{{ userInitials() }}</div>
+          <h2 class="profile-name">{{ profileForm.get('name')?.value || user()?.name || 'User' }}</h2>
+        </div>
+      </div>
+
+      <!-- BUTTON WITH PASSWORD VALIDATION -->
+      <div class="actions">
+        <button 
+          type="button" 
+          class="btn-save" 
+          (click)="onSaveChanges()"
+          [disabled]="profileForm.invalid 
+                      || profileForm.hasError('passwordMismatch')
+                      || isLoading()"
+        >
+          <span *ngIf="!isLoading()">Save changes</span>
+          <span *ngIf="isLoading()" class="loading-spinner">Saving...</span>
+        </button>
+      </div>
+      <!-- SUCCESS MESSAGE -->
+<div class="success-message" *ngIf="updateSuccess()">
+  Profile updated successfully
+</div>
+
+
+    </div>
+  </div>
+</div>

@@ -13,7 +13,12 @@ import { Router } from '@angular/router';
 export class Login implements OnInit {
   ngOnInit(): void {
     if (this.auth.isLoggedIn()) {
-      this.router.navigateByUrl('/home')
+      const user = this.auth.getCurrentUser();
+      if (user?.role === 'driver') {
+        this.router.navigateByUrl('/livreur/deliveries');
+      } else {
+        this.router.navigateByUrl('/home');
+      }
     }
       const params = new URLSearchParams(window.location.search);
   if (params.get('verified') === 'true') {
@@ -71,7 +76,12 @@ export class Login implements OnInit {
         this.loading.set(false);
         if (res.success && res.token && res.user) {
           this.auth.saveSession(res.token, res.user);
-          this.router.navigateByUrl('/home'); // Fixed method name
+          // Rediriger selon le rôle de l'utilisateur
+          if (res.user.role === 'driver') {
+            this.router.navigateByUrl('/livreur/deliveries');
+          } else {
+            this.router.navigateByUrl('/home');
+          }
         } else {
           this.errorMessage.set('Invalid credentials');
         }

@@ -1,0 +1,20 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DeliveriesComponent } from '../deliveries/deliveries';
+
+describe('DeliveriesComponent', () => {
+  let component: DeliveriesComponent;
+  let fixture: ComponentFixture<DeliveriesComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [DeliveriesComponent],
+    }).compileComponents();
+    fixture = TestBed.createComponent(DeliveriesComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

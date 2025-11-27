@@ -49,6 +49,8 @@ export class NewDeliveryComponent implements AfterViewInit, OnDestroy {
       company: new FormControl('', Validators.required),
       pickupAddress: new FormControl('', Validators.required),
       dropoffAddress: this.dropoffAddress,
+      receiverName: new FormControl('', Validators.required),
+      receiverPhone: new FormControl('', [Validators.required, Validators.pattern(/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/)]),
       packageWeight: new FormControl(null, [Validators.required, Validators.min(0)]),
       packageSize: new FormControl('M', Validators.required),
       paymentMethod: new FormControl('Cash on Delivery', Validators.required),
@@ -242,15 +244,23 @@ export class NewDeliveryComponent implements AfterViewInit, OnDestroy {
     }
 
     const user = this.authService.getCurrentUser();
+    const price = Number(this.computePrice()) || 0;
+    const paymentAmount = Number(price) + 7; // payment_amount = price + 7 (valeur fixe)
     const payload = {
       ...this.form.value,
-      price: this.computePrice(),
+      price: price,
+      payment_amount: paymentAmount,
       currency: 'TND',
       status: 'pending',
       client_id: user?.id,
       company_id: this.form.value.company,
       payment_method: this.form.value.paymentMethod,
+      receiver_name: this.form.value.receiverName,
+      receiver_phone: this.form.value.receiverPhone,
     };
+
+    console.log('📦 [FRONTEND] Creating delivery with payload:', payload);
+    console.log('📦 [FRONTEND] price:', price, 'payment_amount:', paymentAmount);
 
     this.deliveryService.createDelivery(payload).subscribe({
       next: (res) => {
@@ -269,6 +279,8 @@ export class NewDeliveryComponent implements AfterViewInit, OnDestroy {
             company: '',
             pickupAddress: '',
             dropoffAddress: '',
+            receiverName: '',
+            receiverPhone: '',
             packageWeight: null,
             packageSize: 'M',
             paymentMethod: 'Cash on Delivery',

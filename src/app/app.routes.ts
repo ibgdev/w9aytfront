@@ -11,6 +11,10 @@ import { NewDeliveryComponent } from './features/client/delivery/new-delivery/ne
 import { History } from './features/client/delivery/history/history';
 import { ConversationsList } from './features/client/chat/conversations-list/conversations-list';
 import { Chat } from './features/client/chat/chat/chat';
+import { DeliveriesComponent } from './features/livreur/deliveries/deliveries';
+import { Deliveryall } from './features/livreur/deliveryall/deliveryall';
+import { ProfileLivreurComponent } from './features/livreur/profilelivreur/profilelivreur';
+import { ChatLivreur } from './features/livreur/chat/chat';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -61,6 +65,36 @@ export const routes: Routes = [
     path: 'chat/:id',
     component: Chat
   },
+  {
+        path: 'livreur',
+        children: [
+            {
+                path: '',
+                redirectTo: 'deliveries',
+                pathMatch: 'full'
+            },
+            {
+                path: 'deliveries',
+                component: DeliveriesComponent
+            },
+            {
+                path: 'deliveryall',
+                component: Deliveryall
+            },
+            {
+                path: 'profilelivreur',
+                component: ProfileLivreurComponent
+            },
+            {
+                path: 'chat',
+                component: ChatLivreur
+            },
+            {
+                path: 'chat/:id',
+                component: ChatLivreur
+            }
+        ]
+    },
   { 
     path: '**', component: Notfound
   },

@@ -97,6 +97,41 @@
           </div>
         </div>
 
+        <!-- Receiver Information Section -->
+        <div class="receiver-section">
+          <h3 class="section-title">Receiver Information</h3>
+          <p class="section-subtitle">Who will receive this delivery?</p>
+          
+          <!-- Receiver Name and Phone Row -->
+          <div class="row two-cols">
+            <div class="col">
+              <label for="receiverName">Receiver Name</label>
+              <input 
+                id="receiverName"
+                type="text" 
+                formControlName="receiverName" 
+                placeholder="Receiver's full name" 
+              />
+              <div class="error-message" *ngIf="form.get('receiverName')?.invalid && form.get('receiverName')?.touched">
+                Receiver name is required
+              </div>
+            </div>
+            <div class="col">
+              <label for="receiverPhone">Receiver Phone</label>
+              <input 
+                id="receiverPhone"
+                type="tel" 
+                formControlName="receiverPhone" 
+                placeholder="+216 21 000 000" 
+              />
+              <div class="error-message" *ngIf="form.get('receiverPhone')?.invalid && form.get('receiverPhone')?.touched">
+                <span *ngIf="form.get('receiverPhone')?.errors?.['required']">Receiver phone is required</span>
+                <span *ngIf="form.get('receiverPhone')?.errors?.['pattern']">Please enter a valid phone number</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Package weight -->
         <div>
           <label for="packageWeight">Package weight</label>

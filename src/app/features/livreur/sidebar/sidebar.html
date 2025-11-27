@@ -1,0 +1,28 @@
+<div class="sidebar">
+  <!-- Logo en haut -->
+  <div class="sidebar-logo">
+    <div class="logo-container">
+      <img src="/logo-trans-full-white.png" alt="W9ayt Delivery Logo" class="logo-image">
+    </div>
+  </div>
+
+  <!-- Menu de navigation -->
+  <nav class="sidebar-menu">
+    <div 
+      *ngFor="let item of menuItems"
+      [class.active]="activeMenu === item.id"
+      class="menu-item"
+      (click)="setActiveMenu(item.id, item.route)">
+      <i [class]="item.icon + ' menu-icon'"></i>
+      <span class="menu-label">{{ item.label }}</span>
+    </div>
+  </nav>
+
+  <!-- Footer avec logout -->
+  <div class="sidebar-footer">
+    <div class="menu-item logout" (click)="logout()">
+      <i class="fa-solid fa-right-from-bracket menu-icon"></i>
+      <span class="menu-label">Logout</span>
+    </div>
+  </div>
+</div>

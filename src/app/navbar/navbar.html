@@ -27,7 +27,7 @@
   </li>
 }
 
-        @if(isloggedIn()){
+        @if(isloggedIn() && currentUser?.role !== 'driver'){
         <!-- Delivery Dropdown Menu -->
         <li class="nav-item dropdown">
           <button class="nav-link dropdown-toggle" [class.active]="isDeliveryOpen" (click)="toggleDeliveryMenu()">
@@ -46,6 +46,15 @@
             <a routerLink="/chat" class="dropdown-item" (click)="closeDeliveryMenu()">Delivery Chat</a>
           </div>
           }
+        </li>
+        }
+        @if(isloggedIn() && currentUser?.role === 'driver'){
+        <!-- Driver Menu -->
+        <li class="nav-item">
+          <a routerLink="/livreur/deliveries" class="nav-link" routerLinkActive="active">Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/livreur/deliveryall" class="nav-link" routerLinkActive="active">All Deliveries</a>
         </li>
         }
         @if (!isloggedIn()) {
@@ -99,13 +108,23 @@
 
         <ul class="profile-menu">
           <li>
-            <a routerLink="/profile" (click)="isProfileOpen = false">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="8" r="3" stroke="currentColor" stroke-width="2" />
-                <path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="2" />
-              </svg>
-              <span>Profile</span>
-            </a>
+            @if (currentUser?.role === 'driver') {
+              <a routerLink="/livreur/profilelivreur" (click)="isProfileOpen = false">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="8" r="3" stroke="currentColor" stroke-width="2" />
+                  <path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="2" />
+                </svg>
+                <span>Profile</span>
+              </a>
+            } @else {
+              <a routerLink="/profile" (click)="isProfileOpen = false">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="8" r="3" stroke="currentColor" stroke-width="2" />
+                  <path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="2" />
+                </svg>
+                <span>Profile</span>
+              </a>
+            }
           </li>
           <li>
             <button (click)="logout()">

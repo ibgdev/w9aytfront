@@ -1,0 +1,130 @@
+<div class="app-container">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-content">
+    <header class="header">
+      <div class="search-bar">
+        <i class="fa-solid fa-calendar search-icon"></i>
+        <input type="date" [(ngModel)]="filterDate" />
+      </div>
+
+      <div class="user-profile">
+        <span class="user-name">{{ driverName() }}</span>
+
+        <!-- AVATAR AVEC INITIALS -->
+        <div class="user-avatar">
+          {{ getInitials() }}
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <h1 class="page-title">Deliveries History</h1>
+
+      <div class="tabs">
+        <button class="tab" [class.active]="filterStatus() === ''" (click)="setFilterStatus('')">All</button>
+        <button class="tab" [class.active]="filterStatus() === 'pending'" (click)="setFilterStatus('pending')">Pending</button>
+        <button class="tab" [class.active]="filterStatus() === 'delivered'" (click)="setFilterStatus('delivered')">Delivered</button>
+        <button class="tab" [class.active]="filterStatus() === 'returned'" (click)="setFilterStatus('returned')">Returned</button>
+      </div>
+
+      <div class="kpi-container">
+        <div class="kpi-card kpi-card-1">
+          <i class="fas fa-box kpi-icon"></i>
+          <h3>Total Deliveries</h3>
+          <p>{{ totalDeliveries() }}</p>
+        </div>
+
+        <div class="kpi-card kpi-card-2">
+          <i class="fas fa-truck-fast kpi-icon"></i>
+          <h3>Deliveries Today</h3>
+          <p>{{ totalToday() }}</p>
+        </div>
+
+        <div class="kpi-card kpi-card-3">
+          <i class="fas fa-coins kpi-icon"></i>
+          <h3>Earnings (per month)</h3>
+          <div *ngIf="earningsPerMonth().length > 0; else noEarnings">
+            <ul>
+              <li *ngFor="let e of earningsPerMonth()">
+                <span>{{ formatMonth(e.month) }}</span>
+                <span>{{ e.amount.toFixed(2) }} TND</span>
+              </li>
+            </ul>
+          </div>
+          <ng-template #noEarnings>
+            <p style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; margin-top: 0.5rem; position: relative; z-index: 1;">No earnings yet</p>
+          </ng-template>
+        </div>
+      </div>
+
+      <div *ngIf="error()" class="error-message">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        {{ error() }}
+      </div>
+
+      <div *ngIf="!loading() && !error()" class="table-container">
+        <table class="deliveries-table">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Pickup</th>
+              <th>Dropoff</th>
+              <th>Delivery_owner</th>
+              <th>Price</th>
+              <th>Deliveries Fees</th>
+              <th>Date of Delivery</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let delivery of filteredDeliveries()" class="delivery-row">
+              <td class="order-cell">ORD_{{ delivery.id }}</td>
+              <td>{{ delivery.pickup_address || 'N/A' }}</td>
+              <td>{{ delivery.dropoff_address || 'N/A' }}</td>
+              <td>
+                <div>{{ delivery.receiver_name || delivery.client_name || 'N/A' }}</div>
+                <div style="font-size: 0.85rem; color: #6b7280;">
+                  {{ delivery.receiver_phone || '' }}
+                </div>
+              </td>
+              <td>{{ delivery.price ? (delivery.price + ' ' + (delivery.currency || 'TND')) : 'N/A' }}</td>
+              <td>{{ delivery.payment_amount && delivery.price ? (delivery.payment_amount - delivery.price) + ' ' + (delivery.currency || 'TND') : 'N/A' }}</td>
+              <td>{{ (delivery.updated_at || delivery.created_at) ? ((delivery.updated_at || delivery.created_at) | date: 'dd/MM/yyyy') : 'N/A' }}</td>
+
+              <td>
+                <span [ngClass]="{
+                  'status-badge': true,
+                  'status-pending': delivery.status === 'pending',
+                  'status-accepted': delivery.status === 'accepted',
+                  'status-in-transit': delivery.status === 'in_transit',
+                  'status-delivered': delivery.status === 'delivered',
+                  'status-completed': delivery.status === 'completed',
+                  'status-returned': delivery.status === 'returned',
+                  'status-cancelled': delivery.status === 'cancelled',
+                  'status-failed': delivery.status === 'failed'
+                }">
+                  {{ delivery.status }}
+                </span>
+              </td>
+
+              <td>
+                <button class="btn-chat" (click)="openChat(delivery)" title="Chat with client">
+                  <i class="fas fa-comments"></i>
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="filteredDeliveries().length === 0">
+              <td colspan="9" class="no-data">
+                <i class="fa-solid fa-inbox"></i>
+                <p>No deliveries</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
