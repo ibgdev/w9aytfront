@@ -99,14 +99,12 @@ export class GestionCompany implements OnInit, OnDestroy {
     console.log('Loading companies...');
     
     this.companyService.getAllCompanies().subscribe({
-      next: (companies: Company[]) => {
-        console.log('Companies received:', companies);
-        
+      next: (response: any) => {
+        const companiesArr = response.data || [];
         // Load each company and fetch its user details
-        const companyPromises = companies.map(company => {
+        const companyPromises = companiesArr.map((company: Company) => {
           return new Promise<CompanyDisplay>((resolve) => {
             const companyDisplay = this.transformCompany(company);
-            
             // Fetch user details if user_id exists
             if (company.user_id) {
               this.userService.getUserById(company.user_id).subscribe({
@@ -135,7 +133,6 @@ export class GestionCompany implements OnInit, OnDestroy {
             }
           });
         });
-
         // Wait for all user details to be fetched
         Promise.all(companyPromises).then((companiesWithUsers) => {
           this.companies = companiesWithUsers;
