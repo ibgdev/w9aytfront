@@ -14,6 +14,13 @@ import { ValidationDemandesComponent } from './features/admin/validation-demande
 import { ContactMessagesComponent } from './features/admin/contact-messages.component/contact-messages.component';
 import { DashboardComponent } from './features/admin/dashboard.component/dashboard.component';
 import { NewDeliveryComponent } from './features/client/delivery/new-delivery/new-delivery';
+import { History } from './features/client/delivery/history/history';
+import { ConversationsList } from './features/client/chat/conversations-list/conversations-list';
+import { Chat } from './features/client/chat/chat/chat';
+import { DeliveriesComponent } from './features/livreur/deliveries/deliveries';
+import { Deliveryall } from './features/livreur/deliveryall/deliveryall';
+import { ProfileLivreurComponent } from './features/livreur/profilelivreur/profilelivreur';
+import { ChatLivreur } from './features/livreur/chat/chat';
 
 import { Companies } from './features/client/companies/companies';
 import { DetailCompany } from './features/client/companies/detail-company/detail-company';
@@ -87,7 +94,48 @@ export const routes: Routes = [
    {
     path: 'new-delivery',
     component: NewDeliveryComponent
+  },    {
+    path: 'history',
+    component: History
   },
+  {
+    path: 'chat',
+    component: Chat
+  },
+  {
+    path: 'chat/:id',
+    component: Chat
+  },
+  {
+        path: 'livreur',
+        children: [
+            {
+                path: '',
+                redirectTo: 'deliveries',
+                pathMatch: 'full'
+            },
+            {
+                path: 'deliveries',
+                component: DeliveriesComponent
+            },
+            {
+                path: 'deliveryall',
+                component: Deliveryall
+            },
+            {
+                path: 'profilelivreur',
+                component: ProfileLivreurComponent
+            },
+            {
+                path: 'chat',
+                component: ChatLivreur
+            },
+            {
+                path: 'chat/:id',
+                component: ChatLivreur
+            }
+        ]
+    },
   { 
     path: '**', component: Notfound
   },

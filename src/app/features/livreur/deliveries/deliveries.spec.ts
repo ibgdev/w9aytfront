@@ -1,0 +1,25 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DeliveriesComponent } from './deliveries';
+import { SidebarComponent } from '../sidebar/sidebar'; // chemin correct vers sidebar.ts
+
+describe('DeliveriesComponent', () => {
+  let component: DeliveriesComponent;
+  let fixture: ComponentFixture<DeliveriesComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [
+        DeliveriesComponent,
+        SidebarComponent,  // intègre la sidebar
+      ],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(DeliveriesComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

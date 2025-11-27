@@ -1,0 +1,106 @@
+<div class="app-container">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-content">
+    
+    <header class="header">
+      <div class="user-profile">
+        <span class="user-name">{{ driverName() }}</span>
+
+        <div class="user-avatar">
+          {{ getInitials() }}
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <h1 class="page-title">My Deliveries</h1>
+
+      <div class="tabs">
+        <button class="tab active">Pending</button>
+      </div>
+
+      <div *ngIf="error()" class="error-message">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        {{ error() }}
+      </div>
+
+      <div *ngIf="loading()" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading deliveries...</p>
+      </div>
+
+      <div *ngIf="!loading() && !error()" class="table-container">
+        <table class="deliveries-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Order</th>
+              <th>Pickup</th>
+              <th>Delivery</th>
+              <th>Receiver</th>
+              <th>Price</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let delivery of deliveries()" class="delivery-row">
+              <td>
+                <input type="checkbox" (change)="markDelivered(delivery, $event)" />
+              </td>
+
+              <td class="order-cell">ORD_{{ delivery.id }}</td>
+
+              <td>{{ delivery.pickup_address || 'N/A' }}</td>
+              <td>{{ delivery.dropoff_address || 'N/A' }}</td>
+              <td>
+                <div>{{ delivery.receiver_name || 'N/A' }}</div>
+                <div style="font-size: 0.85rem; color: #6b7280;">
+                  {{ delivery.receiver_phone || '' }}
+                </div>
+              </td>
+
+              <td>{{ delivery.price ? (delivery.price + ' ' + (delivery.currency || 'TND')) : 'N/A' }}</td>
+
+              <td>{{ delivery.created_at ? (delivery.created_at | date: 'dd/MM/yyyy') : 'N/A' }}</td>
+
+              <td>
+                <span [ngClass]="{
+                  'status-badge': true,
+                  'status-pending': delivery.status.toLowerCase().trim() === 'pending',
+                  'status-accepted': delivery.status.toLowerCase().trim() === 'accepted',
+                  'status-delivered': delivery.status.toLowerCase().trim() === 'delivered',
+                  'status-returned': delivery.status.toLowerCase().trim() === 'returned'
+                }">
+                  {{ delivery.status }}
+                </span>
+              </td>
+
+              <td>
+                <div class="action-buttons">
+                  <button class="btn-chat" (click)="openChat(delivery)" title="Chat with client">
+                    <i class="fas fa-comments"></i>
+                  </button>
+                  <span class="action-icon" (click)="markReturned(delivery)" title="Mark as returned">
+                    −
+                  </span>
+                </div>
+              </td>
+            </tr>
+
+            <tr *ngIf="deliveries().length === 0">
+              <td colspan="9" class="no-data">
+                <i class="fa-solid fa-inbox"></i>
+                <p>You have no deliveries yet</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>

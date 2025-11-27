@@ -1,0 +1,158 @@
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  background: linear-gradient(180deg, #2c4875 0%, #1e3a5f 50%, #1a2a4a 100%);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  position: fixed;
+  left: 0;
+  top: 0;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+
+  .sidebar-logo {
+    padding: 2rem 1rem 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      .logo-image {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+      }
+      
+      svg {
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+      }
+    }
+  }
+
+  .sidebar-menu {
+    flex: 1;
+    padding: 1.5rem 0;
+    overflow-y: auto;
+
+    // Personnalisation de la scrollbar
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.1rem 1.8rem;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    font-size: 1rem;
+    user-select: none;
+    margin: 0.2rem 0;
+
+    .menu-icon {
+      min-width: 24px;
+      font-size: 20px;
+      color: rgba(255, 255, 255, 0.8);
+      transition: all 0.3s ease;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .menu-label {
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+      
+      .menu-icon {
+        color: white;
+        transform: scale(1.1);
+      }
+    }
+
+    &.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      
+      .menu-icon {
+        color: white;
+      }
+    }
+  }
+
+  .sidebar-footer {
+    padding: 1rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto;
+
+    .logout {
+      color: rgba(255, 255, 255, 0.7);
+
+      &:hover {
+        background: rgba(255, 0, 0, 0.1);
+        color: #ff6b6b;
+        
+        .menu-icon {
+          color: #ff6b6b;
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .sidebar {
+    width: 70px;
+
+    .sidebar-logo {
+      padding: 1.5rem 0.5rem;
+      
+      .logo-image {
+        width: 40px;
+        height: 40px;
+      }
+      
+      svg {
+        width: 60px;
+        height: 60px;
+      }
+    }
+
+    .menu-label {
+      display: none;
+    }
+
+    .menu-item {
+      padding: 1rem;
+      justify-content: center;
+    }
+  }
+}

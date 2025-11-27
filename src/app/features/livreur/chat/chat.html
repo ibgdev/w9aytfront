@@ -1,0 +1,204 @@
+<div class="app-container">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-content chat-wrapper">
+    <div class="chat-container">
+      <!-- Sidebar avec liste des conversations -->
+      <div class="chat-sidebar">
+        <div class="sidebar-header">
+          <h2>Messages</h2>
+        </div>
+        
+        <div class="search-container">
+          <div class="search-input-wrapper">
+            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input
+              type="text"
+              [(ngModel)]="searchQuery"
+              (input)="filterConversations()"
+              placeholder="Search"
+              class="search-input"
+            />
+          </div>
+        </div>
+
+        <div class="conversations-list-wrapper">
+          <div *ngIf="isLoadingConversations" class="loading-conversations">
+            <p>Loading conversations...</p>
+          </div>
+          
+          <div *ngIf="!isLoadingConversations && filteredConversations.length === 0" class="empty-conversations">
+            <p>No conversations yet</p>
+          </div>
+
+          <div class="conversations-list">
+            <div
+              *ngFor="let conv of filteredConversations"
+              class="conversation-item"
+              [ngClass]="{ 'active': conv.id === conversationId }"
+              (click)="openConversation(conv.id)"
+            >
+              <div class="conversation-avatar">
+                <div class="avatar-circle">
+                  {{ getInitials(conv.other_user_name || 'U') }}
+                </div>
+              </div>
+              <div class="conversation-content">
+                <div class="conversation-header-row">
+                  <h3 class="conversation-name">{{ conv.other_user_name || 'Unknown' }}</h3>
+                  <span class="conversation-time" *ngIf="conv.last_message_time">
+                    {{ formatConversationTime(conv.last_message_time) }}
+                  </span>
+                </div>
+                <!-- Delivery Info -->
+                <div class="delivery-info-row" *ngIf="conv.delivery_status || conv.pickup_address">
+                  <span class="delivery-status" *ngIf="conv.delivery_status" [style.color]="getDeliveryStatusColor(conv)">
+                    📦 {{ getDeliveryStatus(conv) }}
+                  </span>
+                  <span class="delivery-address" *ngIf="conv.pickup_address" title="{{ conv.dropoff_address }}">
+                    📍 {{ (conv.dropoff_address.length > 25 ? (conv.dropoff_address.substring(0, 25) + '...') : conv.dropoff_address) }}
+                  </span>
+                </div>
+                <div class="conversation-message-row">
+                  <p class="conversation-message" *ngIf="conv.last_message_text">
+                    <span *ngIf="isMyLastMessage(conv)" class="message-prefix">You: </span>
+                    {{ conv.last_message_text.length > 40 ? (conv.last_message_text.substring(0, 40) + '...') : conv.last_message_text }}
+                  </p>
+                  <span *ngIf="conv.unread_count > 0" class="unread-badge">{{ conv.unread_count }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panneau principal de chat -->
+      <div class="chat-main">
+        <div *ngIf="!conversationId" class="no-conversation-selected">
+          <div class="empty-chat-state">
+            <div class="empty-chat-icon">💬</div>
+            <h3>Select a conversation</h3>
+            <p>Choose a conversation from the sidebar to start chatting</p>
+          </div>
+        </div>
+
+        <div *ngIf="conversationId && isLoading" class="loading-chat">
+          <p>Loading conversation...</p>
+        </div>
+
+        <div *ngIf="conversationId && !isLoading && conversation" class="chat-content-wrapper">
+          <!-- Chat Header -->
+          <div class="chat-header-main">
+            <div class="chat-user-info">
+              <div class="chat-user-avatar">
+                <div class="avatar-circle">
+                  {{ getInitials(getOtherUserName()) }}
+                </div>
+              </div>
+              <div class="chat-user-details">
+                <h3>{{ getOtherUserName() }}</h3>
+                <p class="online-status" *ngIf="otherUserOnline">
+                  <span class="online-dot-small"></span> Online
+                </p>
+                <p class="last-seen" *ngIf="!otherUserOnline && getLastSeenTime() !== 'online'">
+                  last seen {{ getLastSeenTime() }}
+                </p>
+                <!-- Delivery Info in Header -->
+                <div class="delivery-info-header" *ngIf="conversation && (conversation.delivery_status || conversation.dropoff_address)">
+                  <span class="delivery-status-badge" *ngIf="conversation.delivery_status" [style.background-color]="getDeliveryStatusColor(conversation) + '20'" [style.color]="getDeliveryStatusColor(conversation)">
+                    📦 {{ getDeliveryStatus(conversation) }}
+                  </span>
+                  <span class="delivery-address-info" *ngIf="conversation.dropoff_address" [title]="conversation.dropoff_address">
+                    📍 {{ conversation.dropoff_address.length > 30 ? (conversation.dropoff_address.substring(0, 30) + '...') : conversation.dropoff_address }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Messages Container -->
+          <div class="messages-container" #messagesContainer>
+            <div *ngFor="let message of messages; let i = index" class="message-wrapper">
+              <div *ngIf="shouldShowDateLabel(message, i)" class="date-label">
+                {{ getDateLabel(message.created_at) }}
+              </div>
+              <div class="message" [ngClass]="{ 'my-message': isMyMessage(message) }">
+                <div class="message-content">
+                  <p *ngIf="message.text" class="message-text">{{ message.text }}</p>
+                  <div *ngIf="message.attachment_url" class="message-attachment">
+                    <div class="attachment-preview">
+                      <span class="attachment-icon">📎</span>
+                      <span class="attachment-name">{{ getFileName(message.attachment_url) }}</span>
+                      <button class="download-btn" (click)="downloadFile(message.attachment_url)">Download</button>
+                    </div>
+                  </div>
+                  <span class="message-time-small">{{ formatTime(message.created_at) }}</span>
+                  <span *ngIf="isMyMessage(message)" class="message-status">✓</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Message Input -->
+          <div class="message-input-container">
+            <div *ngIf="selectedFile" class="selected-file">
+              <span>{{ selectedFile.name }}</span>
+              <button class="remove-file-btn" (click)="removeSelectedFile()">×</button>
+            </div>
+            <div class="input-group">
+              <div class="emoji-picker-wrapper">
+                <button type="button" class="emoji-btn" (click)="toggleEmojiPicker()">😊</button>
+                <div class="emoji-picker-container" *ngIf="showEmojiPicker" (click)="$event.stopPropagation()">
+                  <div class="emoji-picker">
+                    <div class="emoji-grid">
+                      <button 
+                        type="button"
+                        *ngFor="let emoji of emojis" 
+                        class="emoji-item"
+                        (click)="insertEmoji(emoji)"
+                        [title]="emoji"
+                      >
+                        {{ emoji }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <input
+                type="text"
+                [(ngModel)]="newMessage"
+                (keyup.enter)="sendMessage()"
+                placeholder="Message"
+                class="message-input"
+                [disabled]="isSending"
+              />
+              <input
+                type="file"
+                #fileInput
+                (change)="onFileSelected($event)"
+                class="file-input"
+                accept="*/*"
+              />
+              <button class="file-btn" (click)="fileInput.click()" title="Attach file">📎</button>
+              <button
+                class="send-btn"
+                (click)="sendMessage()"
+                [disabled]="isSending || (!newMessage.trim() && !selectedFile)"
+                title="Send message"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
