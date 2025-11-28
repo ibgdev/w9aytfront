@@ -18,6 +18,7 @@
 
       <div class="tabs">
         <button class="tab active">Pending</button>
+        <button class="tab active">In transit</button>
       </div>
 
       <div *ngIf="error()" class="error-message">
@@ -84,9 +85,12 @@
                   <button class="btn-chat" (click)="openChat(delivery)" title="Chat with client">
                     <i class="fas fa-comments"></i>
                   </button>
-                  <span class="action-icon" (click)="markReturned(delivery)" title="Mark as returned">
+                  <button type="button" class="action-icon action-icon--transit" (click)="markInTransit(delivery, $event)" title="Mark as in transit" aria-label="Mark as in transit">
+                    ▶
+                  </button>
+                  <button type="button" class="action-icon" (click)="markReturned(delivery, $event)" title="Mark as returned" aria-label="Mark as returned">
                     −
-                  </span>
+                  </button>
                 </div>
               </td>
             </tr>

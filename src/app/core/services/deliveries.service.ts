@@ -72,6 +72,18 @@ export class DeliveriesService {
     );
   }
 
+  /**
+   * Mark a delivery as "in transit".
+   * Backend route mirrors other actions (e.g. /delivered, /returned).
+   */
+  markAsInTransit(deliveryId: number): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/${deliveryId}/in_transit`,
+      {},
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
   markAsReturned(deliveryId: number): Observable<any> {
     return this.http.post<any>(
       `${this.baseUrl}/${deliveryId}/returned`,

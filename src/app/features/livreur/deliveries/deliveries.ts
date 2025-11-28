@@ -52,7 +52,7 @@ export class DeliveriesComponent implements OnInit, OnDestroy {
 
     this.fetchDeliveries();
 
-    interval(5000)
+    interval(10000)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         this.fetchDeliveries();
@@ -79,14 +79,45 @@ export class DeliveriesComponent implements OnInit, OnDestroy {
     this.loading.set(true);
     this.error.set('');
 
+    let allDeliveries: Delivery[] = [];
+    let pendingLoaded = false;
+    let inTransitLoaded = false;
+
     this.deliveriesService.getDriverDeliveries('pending').subscribe({
       next: (res: DeliveryResponse) => {
-        this.deliveries.set(res.data);
-        this.loading.set(false);
+        allDeliveries = allDeliveries.concat(res.data);
+        pendingLoaded = true;
+        if (pendingLoaded && inTransitLoaded) {
+          this.deliveries.set(allDeliveries);
+          this.loading.set(false);
+        }
       },
       error: (err: any) => {
         this.error.set(err?.message || 'Erreur lors du chargement');
-        this.loading.set(false);
+        pendingLoaded = true;
+        if (pendingLoaded && inTransitLoaded) {
+          this.deliveries.set(allDeliveries);
+          this.loading.set(false);
+        }
+      },
+    });
+
+    this.deliveriesService.getDriverDeliveries('in_transit').subscribe({
+      next: (res: DeliveryResponse) => {
+        allDeliveries = allDeliveries.concat(res.data);
+        inTransitLoaded = true;
+        if (pendingLoaded && inTransitLoaded) {
+          this.deliveries.set(allDeliveries);
+          this.loading.set(false);
+        }
+      },
+      error: (err: any) => {
+        this.error.set(err?.message || 'Erreur lors du chargement');
+        inTransitLoaded = true;
+        if (pendingLoaded && inTransitLoaded) {
+          this.deliveries.set(allDeliveries);
+          this.loading.set(false);
+        }
       },
     });
   }
@@ -129,7 +160,9 @@ export class DeliveriesComponent implements OnInit, OnDestroy {
     });
   }
 
-  markReturned(delivery: Delivery) {
+  markReturned(delivery: Delivery, event?: Event) {
+    // prevent row-level click handlers from triggering
+    try { event?.stopPropagation(); } catch (e) {}
     Swal.fire({
       title: 'Mark as Returned?',
       text: `Do you want to mark delivery #${delivery.id} as returned?`,
@@ -158,6 +191,58 @@ export class DeliveriesComponent implements OnInit, OnDestroy {
             toast: true,
             timerProgressBar: true,
           });
+        });
+      }
+    });
+  }
+
+
+  /**
+   * Mark the delivery as in_transit.
+   */
+  markInTransit(delivery: Delivery, event?: Event) {
+    // prevent row-level click handlers from triggering
+    try { event?.stopPropagation(); } catch (e) {}
+    Swal.fire({
+      title: 'Mark as In Transit?',
+      text: `Do you want to mark delivery #${delivery.id} as in transit?`,
+      imageUrl: '/favicon.ico',
+      imageWidth: 80,
+      imageHeight: 80,
+      imageAlt: 'In transit icon',
+      showCancelButton: true,
+      confirmButtonColor: '#8b5cf6',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, in transit!',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.deliveriesService.markAsInTransit(delivery.id).subscribe({
+          next: () => {
+            // Remove from pending list since it's no longer pending
+            this.deliveries.update((ds) => ds.filter((d) => d.id !== delivery.id));
+
+            Swal.fire({
+              position: 'top-end',
+              imageUrl: '/favicon.ico',
+              imageWidth: 60,
+              imageHeight: 60,
+              imageAlt: 'In transit icon',
+              title: 'Order marked in transit',
+              timer: 2500,
+              toast: true,
+              timerProgressBar: true,
+            });
+            this.fetchDeliveries();
+          },
+          error: (err) => {
+            console.error('Error marking in transit', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to mark as in transit. Please try again.',
+            });
+          }
         });
       }
     });
