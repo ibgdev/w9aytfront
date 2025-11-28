@@ -1,0 +1,137 @@
+<div class="edit-profile-container">
+  <div class="profile-header">
+    <h1>Edit Company Profile</h1>
+    <p>Update your company information and contact details</p>
+  </div>
+
+  <div *ngIf="message" [ngClass]="['alert', messageType === 'success' ? 'alert-success' : 'alert-error']">
+    {{ message }}
+  </div>
+
+  <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
+    <!-- Company Information Section -->
+    <div class="form-section">
+      <h2>Company Information</h2>
+
+      <div class="form-group">
+        <label for="name">Company Name *</label>
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          class="form-input"
+          placeholder="Enter company name"
+        />
+        <span *ngIf="profileForm.get('name')?.invalid && profileForm.get('name')?.touched" class="error-text">
+          Company name is required and must be at least 3 characters
+        </span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="tax_id">Tax ID</label>
+          <input
+            type="text"
+            id="tax_id"
+            formControlName="tax_id"
+            class="form-input"
+            placeholder="Enter tax ID"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="legal_status">Legal Status</label>
+          <select id="legal_status" formControlName="legal_status" class="form-input">
+            <option value="">Select legal status</option>
+            <option value="SARL">SARL</option>
+            <option value="EURL">EURL</option>
+            <option value="SAS">SAS</option>
+            <option value="SASU">SASU</option>
+            <option value="Auto-entrepreneur">Auto-entrepreneur</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Information Section -->
+    <div class="form-section">
+      <h2>Contact Information</h2>
+
+      <div class="form-group">
+        <label for="contact_name">Contact Person Name *</label>
+        <input
+          type="text"
+          id="contact_name"
+          formControlName="contact_name"
+          class="form-input"
+          placeholder="Enter contact person name"
+        />
+        <span *ngIf="profileForm.get('contact_name')?.invalid && profileForm.get('contact_name')?.touched" class="error-text">
+          Contact name is required
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-input"
+          placeholder="Email"
+        />
+        <small>Email cannot be changed</small>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="phone">Phone Number *</label>
+          <input
+            type="tel"
+            id="phone"
+            formControlName="phone"
+            class="form-input"
+            placeholder="Enter phone number"
+          />
+          <span *ngIf="profileForm.get('phone')?.invalid && profileForm.get('phone')?.touched" class="error-text">
+            Phone number is required
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="address">Address *</label>
+          <input
+            type="text"
+            id="address"
+            formControlName="address"
+            class="form-input"
+            placeholder="Enter company address"
+          />
+          <span *ngIf="profileForm.get('address')?.invalid && profileForm.get('address')?.touched" class="error-text">
+            Address is required
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="saving || !profileForm.valid"
+      >
+        <span *ngIf="!saving">Save Changes</span>
+        <span *ngIf="saving">Saving...</span>
+      </button>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="resetForm()"
+        [disabled]="saving"
+      >
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,274 @@
+<div class="drivers-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Drivers Management</h1>
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text"
+          [(ngModel)]="searchTerm"
+          placeholder="Search by name, phone, email, area..."
+          class="search-input"
+        />
+      </div>
+    </div>
+    
+    <button class="btn-add" (click)="openAddModal()">
+      + Add Driver
+    </button>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && drivers.length === 0" class="error-message">
+    {{ error }}
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <table class="drivers-table">
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Deliveries Completed</th>
+          <th>Coverage Area</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let driver of filteredDrivers">
+          <td>{{ driver.patronim }}</td>
+          <td>{{ driver.phone_number }}</td>
+          <td>{{ driver.email }}</td>
+          <td>{{ driver.livraisons_effectuees }}</td>
+          <td>{{ driver.zone_couverture }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="getStatusClass(driver.status)">
+              {{ getStatusLabel(driver.status) }}
+            </span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-details" (click)="viewDetails(driver)">Details</button>
+              <button class="btn-modify" (click)="modifyDriver(driver)">Edit</button>
+              <button class="btn-delete" (click)="deleteDriver(driver)">Delete</button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="filteredDrivers.length === 0">
+          <td colspan="7" class="no-data">No drivers found</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="filteredDrivers.length > 0">
+      <span>{{ filteredDrivers.length }} driver(s)</span>
+    </div>
+  </div>
+
+  <!-- ============================================
+       MODAL 1: ADD DRIVER
+  ============================================ -->
+  <div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2>Add Driver</h2>
+      
+      <div class="error-message" *ngIf="error">
+        ⚠️ {{ error }}
+      </div>
+
+      <form (ngSubmit)="addDriver()" #driverForm="ngForm">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="newDriver.patronim" 
+            name="patronim" 
+            placeholder="Ex: John Smith" 
+            required 
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Phone *</label>
+          <input 
+            type="tel" 
+            [(ngModel)]="newDriver.telephone" 
+            name="telephone" 
+            placeholder="+216 XX XXX XXX" 
+            required 
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Email *</label>
+          <input 
+            type="email" 
+            [(ngModel)]="newDriver.email" 
+            name="email" 
+            placeholder="example@email.com" 
+            required 
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Password *</label>
+          <input 
+            type="password" 
+            [(ngModel)]="newDriver.motDePasse" 
+            name="motDePasse" 
+            placeholder="Min 6 characters" 
+            required 
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Coverage Area</label>
+          <input 
+            type="text" 
+            [(ngModel)]="newDriver.zoneCouverture" 
+            name="zoneCouverture" 
+            placeholder="Ex: Sousse Center" 
+          />
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="closeAddModal()" [disabled]="loading">
+            Cancel
+          </button>
+          <button type="submit" class="btn-submit" [disabled]="loading || !driverForm.valid">
+            {{ loading ? 'Adding...' : 'Add Driver' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================
+       MODAL 2: EDIT DRIVER
+  ============================================ -->
+  <div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2>Edit Driver</h2>
+
+      <form (ngSubmit)="saveEdit()" #editForm="ngForm">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="editDriver.patronim" 
+            name="patronim" 
+            required 
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Phone *</label>
+          <input 
+            type="tel" 
+            [(ngModel)]="editDriver.telephone" 
+            name="telephone" 
+            required 
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Email *</label>
+          <input 
+            type="email" 
+            [(ngModel)]="editDriver.email" 
+            name="email" 
+            required 
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Coverage Area</label>
+          <input 
+            type="text" 
+            [(ngModel)]="editDriver.zoneCouverture" 
+            name="zoneCouverture" 
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Status *</label>
+          <select [(ngModel)]="editDriver.status" name="status" required>
+            <option value="available">Available</option>
+            <option value="busy">Busy</option>
+            <option value="offline">Offline</option>
+            <option value="suspended">Suspended</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="closeEditModal()" [disabled]="loading">
+            Cancel
+          </button>
+          <button type="submit" class="btn-submit" [disabled]="loading || !editForm.valid">
+            {{ loading ? 'Updating...' : 'Save' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================
+       MODAL 3: DRIVER DETAILS
+  ============================================ -->
+  <div class="modal-overlay" *ngIf="showDetailsModal" (click)="closeDetailsModal()">
+    <div class="modal-content modal-details" (click)="$event.stopPropagation()">
+      <h2>Driver Details</h2>
+
+      <div class="details-grid" *ngIf="selectedDriver">
+        <div class="detail-section">
+          <h3>📋 Personal Information</h3>
+          <div class="detail-item">
+            <span class="detail-label">Full Name:</span>
+            <span class="detail-value">{{ selectedDriver.patronim }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Email:</span>
+            <span class="detail-value">{{ selectedDriver.email }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Phone:</span>
+            <span class="detail-value">{{ selectedDriver.phone_number }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Area:</span>
+            <span class="detail-value">{{ selectedDriver.zone_couverture }}</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>📊 Statistics</h3>
+          <div class="detail-item">
+            <span class="detail-label">Status:</span>
+            <span class="status-badge" [ngClass]="getStatusClass(selectedDriver.status)">
+              {{ getStatusLabel(selectedDriver.status) }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Deliveries:</span>
+            <span class="detail-value">{{ selectedDriver.livraisons_effectuees || 0 }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Registration Date:</span>
+            <span class="detail-value">{{ selectedDriver.created_at | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="closeDetailsModal()">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

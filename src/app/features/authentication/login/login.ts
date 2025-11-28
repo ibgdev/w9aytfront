@@ -16,6 +16,8 @@ export class Login implements OnInit {
       const user = this.auth.getCurrentUser();
       if (user?.role === 'driver') {
         this.router.navigateByUrl('/livreur/deliveries');
+      } else if (user?.role === 'company') {
+        this.router.navigateByUrl('/company');
       } else {
         this.router.navigateByUrl('/home');
       }
@@ -79,6 +81,8 @@ export class Login implements OnInit {
           // Rediriger selon le rôle de l'utilisateur
           if (res.user.role === 'driver') {
             this.router.navigateByUrl('/livreur/deliveries');
+          } else if (res.user.role === 'company') {
+            this.router.navigateByUrl('/company');
           } else {
             this.router.navigateByUrl('/home');
           }

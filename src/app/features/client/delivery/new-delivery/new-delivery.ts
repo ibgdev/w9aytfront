@@ -289,7 +289,7 @@ export class NewDeliveryComponent implements AfterViewInit, OnDestroy {
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'Erreur lors de l\'enregistrement.'
+            text: 'Error while saving. Please try again.'
           });
         }
       },
@@ -297,7 +297,7 @@ export class NewDeliveryComponent implements AfterViewInit, OnDestroy {
         Swal.fire({
           icon: 'error',
           title: 'Server Error',
-          text: 'Erreur serveur: ' + (err?.error?.error || err.message)
+          text: 'Server error: ' + (err?.error?.error || err.message)
         });
       }
     });

@@ -227,7 +227,7 @@ export class Profile implements OnInit {
         this.successMessage.set('Account deleted successfully. Redirecting...');
         setTimeout(() => {
           this.auth.logout();
-          this.router.navigate(['/']);
+          this.router.navigate(['/home']);
         }, 2000);
       },
       error: (error) => {
@@ -242,7 +242,7 @@ export class Profile implements OnInit {
       this.successMessage.set('Account deleted successfully. Redirecting...');
       setTimeout(() => {
         this.auth.logout();
-        this.router.navigate(['/']);
+        this.router.navigate(['/home']);
       }, 2000);
     }, 1000);
   }
@@ -250,7 +250,7 @@ export class Profile implements OnInit {
   // Logout
   onLogout() {
     this.auth.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home']);
   }
 
   // Helper methods

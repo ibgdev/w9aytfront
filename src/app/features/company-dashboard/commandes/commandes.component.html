@@ -1,0 +1,397 @@
+<div class="commandes-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>Orders Management</h1>
+    
+    <div class="header-actions">
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()"
+          placeholder="Search by ID, client, phone, address, driver, price..." 
+          class="search-input"
+        />
+        <button 
+          *ngIf="searchTerm" 
+          class="clear-search" 
+          (click)="clearSearch()"
+          title="Clear search"
+        >
+          ✕
+        </button>
+      </div>
+      
+      <select [(ngModel)]="statusFilter" class="filter-select">
+        <option value="all">All statuses</option>
+        <option value="pending">Pending</option>
+        <option value="accepted">Accepted</option>
+        <option value="in_transit">In Transit</option>
+        <option value="delivered">Delivered</option>
+        <option value="cancelled">Cancelled</option>
+        <option value="returned">Returned</option>
+      </select>
+
+      <button class="btn-add" (click)="openAddModal()">
+        + New Order
+      </button>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && deliveries.length === 0" class="error-message">
+    {{ error }}
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <table class="commandes-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Client</th>
+          <th>Delivery Address</th>
+          <th>Phone</th>
+          <th>Status</th>
+          <th>Driver</th>
+          <th>Price</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cmd of filteredDeliveries">
+          <td>{{ cmd.id }}</td>
+          <td>{{ cmd.client }}</td>
+          <td>{{ cmd.adresse_livraison }}</td>
+          <td>{{ cmd.receiver_phone }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="getStatusClass(cmd.statut)">
+              {{ getStatusLabel(cmd.statut) }}
+            </span>
+          </td>
+          <td>{{ cmd.livreur_assigne }}</td>
+          <td>{{ cmd.price }} TND</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-details" (click)="viewDetails(cmd)">Details</button>
+              <button class="btn-modify" (click)="modifyDelivery(cmd)">Edit</button>
+              <button class="btn-delete" (click)="deleteDelivery(cmd)">Delete</button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="filteredDeliveries.length === 0">
+          <td colspan="8" class="no-data">No orders found</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="filteredDeliveries.length > 0">
+      <span>{{ filteredDeliveries.length }} order(s)</span>
+    </div>
+  </div>
+
+  <!-- ============================================
+       MODAL 1: ADD ORDER
+  ============================================ -->
+  <div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2>New Order</h2>
+      
+      <div class="error-message" *ngIf="error">
+        ⚠️ {{ error }}
+      </div>
+
+      <form (ngSubmit)="addDelivery()" #deliveryForm="ngForm">
+        <!-- Client Selection -->
+        <div class="form-group">
+          <label>Client *</label>
+          <select 
+            [(ngModel)]="newDelivery.client_id" 
+            name="client_id" 
+            required
+            class="form-select"
+          >
+            <option [value]="0">-- Select a client --</option>
+            <option *ngFor="let client of clients" [value]="client.id">
+              {{ client.name }} ({{ client.email }})
+            </option>
+          </select>
+        </div>
+
+        <!-- Driver Selection (Optional) -->
+        <div class="form-group">
+          <label>Driver (Optional)</label>
+          <select 
+            [(ngModel)]="newDelivery.driver_id" 
+            name="driver_id"
+            class="form-select"
+          >
+            <option [value]="null">-- Assign later --</option>
+            <option *ngFor="let driver of drivers" [value]="driver.id">
+              {{ driver.name }} ({{ driver.phone }})
+            </option>
+          </select>
+        </div>
+
+        <!-- Receiver Info -->
+        <div class="form-group">
+          <label>Receiver Name *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="newDelivery.receiver_name" 
+            name="receiver_name" 
+            placeholder="Ex: John Smith" 
+            required 
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Receiver Phone *</label>
+          <input 
+            type="tel" 
+            [(ngModel)]="newDelivery.receiver_phone" 
+            name="receiver_phone" 
+            placeholder="+216 XX XXX XXX" 
+            required 
+          />
+        </div>
+
+        <!-- Addresses -->
+        <div class="form-group">
+          <label>Pickup Address</label>
+          <input 
+            type="text" 
+            [(ngModel)]="newDelivery.pickup_address" 
+            name="pickup_address" 
+            placeholder="Pickup location" 
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Delivery Address *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="newDelivery.dropoff_address" 
+            name="dropoff_address" 
+            placeholder="Delivery destination" 
+            required 
+          />
+        </div>
+
+        <!-- Package Details -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Weight (kg)</label>
+            <input 
+              type="number" 
+              [(ngModel)]="newDelivery.weight" 
+              name="weight" 
+              placeholder="0" 
+              min="0"
+              step="0.1"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Size</label>
+            <select [(ngModel)]="newDelivery.size" name="size">
+              <option value="S">Small (S)</option>
+              <option value="M">Medium (M)</option>
+              <option value="L">Large (L)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Payment -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Price (TND)</label>
+            <input 
+              type="number" 
+              [(ngModel)]="newDelivery.price" 
+              name="price" 
+              placeholder="0" 
+              min="0"
+              step="0.01"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Payment Method</label>
+            <select [(ngModel)]="newDelivery.payment_method" name="payment_method">
+              <option value="cash">Cash</option>
+              <option value="card">Card</option>
+              <option value="online">Online</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="closeAddModal()" [disabled]="loading">
+            Cancel
+          </button>
+          <button type="submit" class="btn-submit" [disabled]="loading || !deliveryForm.valid">
+            {{ loading ? 'Creating...' : 'Create Order' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================
+       MODAL 2: EDIT ORDER
+  ============================================ -->
+  <div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+    <div class="modal-content modal-edit" (click)="$event.stopPropagation()">
+      <h2>Edit Order #{{ editDelivery.id }}</h2>
+
+      <form (ngSubmit)="saveEdit()" #editForm="ngForm">
+        <!-- Status Selection -->
+        <div class="form-group">
+          <label>Status *</label>
+          <select 
+            [(ngModel)]="editDelivery.status" 
+            name="status" 
+            required
+            class="form-select"
+          >
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="in_transit">In Transit</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="returned">Returned</option>
+          </select>
+        </div>
+
+        <!-- Driver Selection -->
+        <div class="form-group">
+          <label>Assign a Driver</label>
+          <select 
+            [(ngModel)]="editDelivery.driver_id" 
+            name="driver_id"
+            class="form-select"
+          >
+            <option [value]="null">-- Not assigned --</option>
+            <option *ngFor="let driver of drivers" [value]="driver.id">
+              {{ driver.name }} ({{ driver.phone }})
+            </option>
+          </select>
+        </div>
+
+        <!-- Actions -->
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="closeEditModal()" [disabled]="loading">
+            Cancel
+          </button>
+          <button type="submit" class="btn-submit" [disabled]="loading || !editForm.valid">
+            {{ loading ? 'Updating...' : 'Save' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================
+       MODAL 3: ORDER DETAILS
+  ============================================ -->
+  <div class="modal-overlay" *ngIf="showDetailsModal" (click)="closeDetailsModal()">
+    <div class="modal-content modal-details" (click)="$event.stopPropagation()">
+      <h2>Order Details #{{ selectedDelivery?.id }}</h2>
+
+      <div class="details-grid" *ngIf="selectedDelivery">
+        <!-- Client Info -->
+        <div class="detail-section">
+          <h3>📋 Client Information</h3>
+          <div class="detail-item">
+            <span class="detail-label">Name:</span>
+            <span class="detail-value">{{ selectedDelivery.client_name }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Email:</span>
+            <span class="detail-value">{{ selectedDelivery.client_email }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Phone:</span>
+            <span class="detail-value">{{ selectedDelivery.client_phone }}</span>
+          </div>
+        </div>
+
+        <!-- Delivery Info -->
+        <div class="detail-section">
+          <h3>📦 Delivery Information</h3>
+          <div class="detail-item">
+            <span class="detail-label">Receiver:</span>
+            <span class="detail-value">{{ selectedDelivery.receiver_name }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Phone:</span>
+            <span class="detail-value">{{ selectedDelivery.receiver_phone }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Pickup Address:</span>
+            <span class="detail-value">{{ selectedDelivery.pickup_address || 'Not specified' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Delivery Address:</span>
+            <span class="detail-value">{{ selectedDelivery.dropoff_address }}</span>
+          </div>
+        </div>
+
+        <!-- Package Info -->
+        <div class="detail-section">
+          <h3>📏 Package Information</h3>
+          <div class="detail-item">
+            <span class="detail-label">Weight:</span>
+            <span class="detail-value">{{ selectedDelivery.weight }} kg</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Size:</span>
+            <span class="detail-value">{{ selectedDelivery.size }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Price:</span>
+            <span class="detail-value">{{ selectedDelivery.price }} {{ selectedDelivery.currency }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Payment Method:</span>
+            <span class="detail-value">{{ selectedDelivery.payment_method }}</span>
+          </div>
+        </div>
+
+        <!-- Status Info -->
+        <div class="detail-section">
+          <h3>🚚 Status & Driver</h3>
+          <div class="detail-item">
+            <span class="detail-label">Status:</span>
+            <span class="status-badge" [ngClass]="getStatusClass(selectedDelivery.status)">
+              {{ getStatusLabel(selectedDelivery.status) }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Driver:</span>
+            <span class="detail-value">{{ selectedDelivery.driver_name }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Created Date:</span>
+            <span class="detail-value">{{ selectedDelivery.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedDelivery.completed_at">
+            <span class="detail-label">Delivery Date:</span>
+            <span class="detail-value">{{ selectedDelivery.completed_at | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Close Button -->
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="closeDetailsModal()">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
