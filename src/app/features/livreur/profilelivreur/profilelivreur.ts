@@ -12,6 +12,7 @@ import { User } from '../../../core/models/user.model';
 import { ProfileLivreurService } from '../../../core/services/profilelivreur.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-profilelivreur',
@@ -142,14 +143,41 @@ export class ProfileLivreurComponent implements OnInit {
   }
 
   onDeleteAccount(): void {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer votre compte ?')) return;
-    this.isLoading.set(true);
-    this.profileService.deleteAccount().subscribe({
-      next: () => this.isLoading.set(false),
-      error: (err: any) => {
-        this.isLoading.set(false);
-        console.error('Erreur lors de la suppression:', err);
-      },
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you really want to delete your account? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.isLoading.set(true);
+        this.profileService.deleteAccount().subscribe({
+          next: () => {
+            this.isLoading.set(false);
+            Swal.fire({
+              title: 'Deleted!',
+              text: 'Your account has been deleted successfully.',
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            });
+            this.router.navigateByUrl('/login');
+          },
+          error: (err: any) => {
+            this.isLoading.set(false);
+            console.error('Error deleting account:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to delete account. Please try again.'
+            });
+          }
+        });
+      }
     });
   }
 

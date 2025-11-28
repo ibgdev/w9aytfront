@@ -1,0 +1,75 @@
+<div class="stats-container">
+  <div class="page-header">
+    <h1>📊 Dashboard - Statistics</h1>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="error-message">
+    ⚠️ {{ error }}
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card card-green">
+      <div class="stat-icon">📦</div>
+      <div class="stat-content">
+        <div class="stat-header">
+          <span class="stat-title">Total Orders</span>
+        </div>
+        <div class="stat-value">{{ stats.commandesTotales | number }}</div>
+        <div class="stat-subtitle">This month</div>
+      </div>
+    </div>
+
+    <div class="stat-card card-blue">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <div class="stat-header">
+          <span class="stat-title">Delivered Orders</span>
+        </div>
+        <div class="stat-value">{{ stats.commandesLivrees | number }}</div>
+        <div class="stat-subtitle">This month</div>
+      </div>
+    </div>
+
+    <div class="stat-card card-red">
+      <div class="stat-icon">❌</div>
+      <div class="stat-content">
+        <div class="stat-header">
+          <span class="stat-title">Cancelled Orders</span>
+        </div>
+        <div class="stat-value">{{ stats.commandesAnnulees }}</div>
+        <div class="stat-subtitle">This month</div>
+      </div>
+    </div>
+
+    <div class="stat-card card-purple">
+      <div class="stat-icon">🚚</div>
+      <div class="stat-content">
+        <div class="stat-header">
+          <span class="stat-title">Active Drivers</span>
+        </div>
+        <div class="stat-value">{{ stats.livreursActifs }}</div>
+        <div class="stat-subtitle">Online</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section - ALWAYS IN DOM -->
+  <div class="charts-section">
+    <!-- Bar Chart -->
+    <div class="chart-card chart-large">
+      <div class="chart-wrapper">
+        <canvas id="barChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Donut Chart -->
+    <div class="chart-card chart-small">
+      <div class="chart-wrapper">
+        <canvas id="donutChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>

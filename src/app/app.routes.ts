@@ -21,6 +21,11 @@ import { DeliveriesComponent } from './features/livreur/deliveries/deliveries';
 import { Deliveryall } from './features/livreur/deliveryall/deliveryall';
 import { ProfileLivreurComponent } from './features/livreur/profilelivreur/profilelivreur';
 import { ChatLivreur } from './features/livreur/chat/chat';
+import { CompanyDashboardComponent } from './features/company-dashboard/company-dashboard.component';
+import { DriversListComponent } from './features/company-dashboard/drivers-list/drivers-list.component';
+import { CommandesComponent } from './features/company-dashboard/commandes/commandes.component';
+import { StatistiquesComponent } from './features/company-dashboard/statistiques/statistiques.component';
+import { EditProfileComponent } from './features/company-dashboard/edit-profile/edit-profile.component';
 
 import { Companies } from './features/client/companies/companies';
 import { DetailCompany } from './features/client/companies/detail-company/detail-company';
@@ -135,6 +140,33 @@ export const routes: Routes = [
                 component: ChatLivreur
             }
         ]
+    },
+    {
+      path: 'company',
+      component: CompanyDashboardComponent,
+      children: [
+        {
+          path: '',
+          redirectTo: 'livreurs',
+          pathMatch: 'full'
+        },
+        {
+          path: 'livreurs',
+          component: DriversListComponent
+        },
+        {
+          path: 'commandes',
+          component: CommandesComponent
+        },
+        {
+          path: 'statistiques',
+          component: StatistiquesComponent
+        },
+        {
+          path: 'edit-profile',
+          component: EditProfileComponent
+        }
+      ]
     },
   { 
     path: '**', component: Notfound

@@ -14,11 +14,16 @@ export class Login implements OnInit {
   ngOnInit(): void {
     if (this.auth.isLoggedIn()) {
       const user = this.auth.getCurrentUser();
-      if (user?.role === 'admin') {
+      if (user?.role === 'driver') {
+        this.router.navigateByUrl('/livreur/deliveries');
+      } else if (user?.role === 'company') {
+        this.router.navigateByUrl('/company');
+      } else if (user?.role === 'admin') {
         this.router.navigateByUrl('/admin');
       } else {
         this.router.navigateByUrl('/home');
       }
+      return;
     }
     const params = new URLSearchParams(window.location.search);
     if (params.get('verified') === 'true') {
@@ -76,9 +81,12 @@ export class Login implements OnInit {
         this.loading.set(false);
         if (res.success && res.token && res.user) {
           this.auth.saveSession(res.token, res.user);
-          
           // Redirect based on user role
-          if (res.user.role === 'admin') {
+          if (res.user.role === 'driver') {
+            this.router.navigateByUrl('/livreur/deliveries');
+          } else if (res.user.role === 'company') {
+            this.router.navigateByUrl('/company');
+          } else if (res.user.role === 'admin') {
             this.router.navigateByUrl('/admin');
           } else {
             this.router.navigateByUrl('/home');
@@ -89,7 +97,6 @@ export class Login implements OnInit {
       },
       error: (err) => {
         this.loading.set(false);
-        
         // Check if it's a verification error (403)
         if (err.message && err.message.includes('verify your email')) {
           this.errorMessage.set(err.message);
