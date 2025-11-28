@@ -12,7 +12,7 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class SidebarComponent {
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
+  public readonly router = inject(Router);
 
   menuItems = [
     { id: 'deliveries', label: 'Deliveries', icon: 'fa-solid fa-cart-shopping', route: '/livreur/deliveries' },
@@ -21,13 +21,8 @@ export class SidebarComponent {
     { id: 'settings', label: 'Settings', icon: 'fa-solid fa-gear', route: '/livreur/profilelivreur' }
   ];
 
-  activeMenu = 'dashboard';
-
-  setActiveMenu(id: string, route?: string) {
-    this.activeMenu = id;
-    if (route) {
-      this.router.navigate([route]);
-    }
+  isRouteActive(route: string): boolean {
+    return this.router.url === route;
   }
 
   logout(): void {

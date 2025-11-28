@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import Swal from 'sweetalert2';
 import { DeliveryService } from '../../../../core/services/delivery.service';
 import { CommonModule } from '@angular/common';
@@ -13,7 +13,7 @@ import { ChatService } from '../../../../core/services/chat.service';
 
 @Component({
   selector: 'app-history',
-  imports: [CommonModule, FormsModule, RouterModule, Navbar, Footer,ContactUs],
+  imports: [CommonModule, FormsModule, RouterModule, Navbar, Footer],
   templateUrl: './history.html',
   styleUrl: './history.scss',
 })
@@ -27,6 +27,7 @@ export class History implements OnInit {
   totalPages: number = 1;
   totalDeliveries: number = 0;
   isLoading: boolean = false;
+    private auth = inject(AuthService);
 
   constructor(
     private deliveryService: DeliveryService,
@@ -38,6 +39,18 @@ export class History implements OnInit {
 
   ngOnInit() {
   this.fetchDeliveries();
+      if (!this.auth.isLoggedIn()) {
+      this.router.navigateByUrl('/login');
+      return;
+    }
+
+    // Check if user is admin
+    const user = this.auth.getCurrentUser();
+    if (user?.role !== 'client') {
+      this.router.navigateByUrl('/home');
+      return;
+
+  }
   }
 
   fetchDeliveries(params?: any) {

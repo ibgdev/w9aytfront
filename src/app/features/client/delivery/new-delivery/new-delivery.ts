@@ -12,6 +12,7 @@ import { DeliveryService } from '../../../../core/services/delivery.service';
 import { Navbar } from '../../../../navbar/navbar';
 import { Footer } from '../../../../footer/footer';
 import { AllCompaniesService, PublicCompany } from '../../../../core/services/all-companies.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-new-delivery',
@@ -32,6 +33,8 @@ export class NewDeliveryComponent implements AfterViewInit, OnDestroy,OnInit {
   private subs = new Subscription();
   companies = signal<PublicCompany[]>([]);
   private allCompaniesService = inject(AllCompaniesService);
+  private auth = inject(AuthService);
+  private router = inject(Router);
 
   // address status for UI hints: 'idle' | 'searching' | 'valid' | 'not-found' | 'too-short' | 'error'
   addressStatus: string = 'idle';
@@ -73,6 +76,19 @@ export class NewDeliveryComponent implements AfterViewInit, OnDestroy,OnInit {
   }
   ngOnInit(): void {
     this.getCompanies();
+
+    if (!this.auth.isLoggedIn()) {
+      this.router.navigateByUrl('/login');
+      return;
+    }
+
+    // Check if user is admin
+    const user = this.auth.getCurrentUser();
+    if (user?.role !== 'client') {
+      this.router.navigateByUrl('/home');
+      return;
+
+  }
   }
 
   ngAfterViewInit(): void {

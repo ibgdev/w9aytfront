@@ -10,9 +10,9 @@
   <nav class="sidebar-menu">
     <div 
       *ngFor="let item of menuItems"
-      [class.active]="activeMenu === item.id"
+      [class.active]="isRouteActive(item.route)"
       class="menu-item"
-      (click)="setActiveMenu(item.id, item.route)">
+      (click)="router.navigate([item.route])">
       <i [class]="item.icon + ' menu-icon'"></i>
       <span class="menu-label">{{ item.label }}</span>
     </div>

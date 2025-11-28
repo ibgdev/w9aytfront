@@ -36,7 +36,6 @@ export class Companies implements OnInit {
       return;
     }
 
-    // Check if user is admin
     const user = this.auth.getCurrentUser();
     if (user?.role !== 'client') {
       this.router.navigateByUrl('/home');

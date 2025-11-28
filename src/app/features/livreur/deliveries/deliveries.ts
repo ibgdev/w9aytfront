@@ -1,7 +1,11 @@
 import { Component, OnInit, OnDestroy, signal, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { DeliveriesService, Delivery, DeliveryResponse } from '../../../core/services/deliveries.service';
+import {
+  DeliveriesService,
+  Delivery,
+  DeliveryResponse,
+} from '../../../core/services/deliveries.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { SidebarComponent } from '../sidebar/sidebar';
 import Swal from 'sweetalert2';
@@ -14,7 +18,7 @@ import { takeUntil } from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule, SidebarComponent],
   templateUrl: './deliveries.html',
-  styleUrls: ['./deliveries.scss']
+  styleUrls: ['./deliveries.scss'],
 })
 export class DeliveriesComponent implements OnInit, OnDestroy {
   deliveries = signal<Delivery[]>([]);
@@ -34,6 +38,16 @@ export class DeliveriesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const user = this.authService.getCurrentUser();
+
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigateByUrl('/login');
+      return;
+    }
+
+    if (user?.role !== 'driver') {
+      this.router.navigateByUrl('/home');
+      return;
+    }
     this.driverName.set(user?.name || 'Driver');
 
     this.fetchDeliveries();
@@ -58,10 +72,7 @@ export class DeliveriesComponent implements OnInit, OnDestroy {
       return words[0].charAt(0).toUpperCase();
     }
 
-    return (
-      words[0].charAt(0).toUpperCase() +
-      words[1].charAt(0).toUpperCase()
-    );
+    return words[0].charAt(0).toUpperCase() + words[1].charAt(0).toUpperCase();
   }
 
   fetchDeliveries(): void {
@@ -76,7 +87,7 @@ export class DeliveriesComponent implements OnInit, OnDestroy {
       error: (err: any) => {
         this.error.set(err?.message || 'Erreur lors du chargement');
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -94,11 +105,11 @@ export class DeliveriesComponent implements OnInit, OnDestroy {
       confirmButtonColor: '#10b981',
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Yes, delivered!',
-      cancelButtonText: 'Cancel'
+      cancelButtonText: 'Cancel',
     }).then((result) => {
       if (result.isConfirmed) {
         this.deliveriesService.markAsDelivered(delivery.id).subscribe(() => {
-          this.deliveries.update(ds => ds.filter(d => d.id !== delivery.id));
+          this.deliveries.update((ds) => ds.filter((d) => d.id !== delivery.id));
 
           Swal.fire({
             position: 'top-end',
@@ -109,7 +120,7 @@ export class DeliveriesComponent implements OnInit, OnDestroy {
             title: 'Order has been delivered',
             timer: 2500,
             toast: true,
-            timerProgressBar: true
+            timerProgressBar: true,
           });
         });
       } else {
@@ -130,11 +141,11 @@ export class DeliveriesComponent implements OnInit, OnDestroy {
       confirmButtonColor: '#ef4444',
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Yes, returned!',
-      cancelButtonText: 'Cancel'
+      cancelButtonText: 'Cancel',
     }).then((result) => {
       if (result.isConfirmed) {
         this.deliveriesService.markAsReturned(delivery.id).subscribe(() => {
-          this.deliveries.update(ds => ds.filter(d => d.id !== delivery.id));
+          this.deliveries.update((ds) => ds.filter((d) => d.id !== delivery.id));
 
           Swal.fire({
             position: 'top-end',
@@ -145,7 +156,7 @@ export class DeliveriesComponent implements OnInit, OnDestroy {
             title: 'Order has been returned',
             timer: 2500,
             toast: true,
-            timerProgressBar: true
+            timerProgressBar: true,
           });
         });
       }
@@ -159,7 +170,7 @@ export class DeliveriesComponent implements OnInit, OnDestroy {
         icon: 'info',
         title: 'No Client',
         text: 'This delivery does not have a client assigned.',
-        confirmButtonText: 'OK'
+        confirmButtonText: 'OK',
       });
       return;
     }
@@ -174,7 +185,7 @@ export class DeliveriesComponent implements OnInit, OnDestroy {
             icon: 'error',
             title: 'Error',
             text: 'Failed to create conversation. Please try again.',
-            confirmButtonText: 'OK'
+            confirmButtonText: 'OK',
           });
         }
       },
@@ -184,9 +195,9 @@ export class DeliveriesComponent implements OnInit, OnDestroy {
           icon: 'error',
           title: 'Error',
           text: err?.error?.message || 'Failed to open chat. Please try again.',
-          confirmButtonText: 'OK'
+          confirmButtonText: 'OK',
         });
-      }
+      },
     });
   }
 }

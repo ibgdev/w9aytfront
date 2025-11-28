@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -77,9 +77,22 @@ export class ChatLivreur implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {}
 
+      private auth = inject(AuthService);
+
+
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
-    
+    if (!this.auth.isLoggedIn()) {
+      this.router.navigateByUrl('/login');
+      return;
+    }
+
+    const user = this.auth.getCurrentUser();
+    if (user?.role !== 'driver') {
+      this.router.navigateByUrl('/home');
+      return;
+
+  }
     // Charger les conversations
     this.loadConversations();
     

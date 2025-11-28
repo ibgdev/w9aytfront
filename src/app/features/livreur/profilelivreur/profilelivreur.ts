@@ -1,16 +1,24 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { SidebarComponent } from '../sidebar/sidebar';
 import { User } from '../../../core/models/user.model';
 import { ProfileLivreurService } from '../../../core/services/profilelivreur.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profilelivreur',
   standalone: true,
   imports: [CommonModule, SidebarComponent, ReactiveFormsModule],
   templateUrl: './profilelivreur.html',
-  styleUrls: ['./profilelivreur.scss']
+  styleUrls: ['./profilelivreur.scss'],
 })
 export class ProfileLivreurComponent implements OnInit {
   user = signal<User | null>(null);
@@ -23,16 +31,32 @@ export class ProfileLivreurComponent implements OnInit {
     private readonly profileService: ProfileLivreurService,
     private readonly fb: FormBuilder
   ) {}
+  private auth = inject(AuthService);
+  private router = inject(Router);
 
   ngOnInit(): void {
-    this.profileForm = this.fb.group({
-      name: [''],
-      email: [{ value: '', disabled: true }],
-      phone: [''],
-      address: [''],
-      password: [''],
-      confirmPassword: ['']
-    }, { validators: this.passwordMatchValidator });
+    const user = this.auth.getCurrentUser();
+
+    if (!this.auth.isLoggedIn()) {
+      this.router.navigateByUrl('/login');
+      return;
+    }
+
+    if (user?.role !== 'driver') {
+      this.router.navigateByUrl('/home');
+      return;
+    }
+    this.profileForm = this.fb.group(
+      {
+        name: [''],
+        email: [{ value: '', disabled: true }],
+        phone: [''],
+        address: [''],
+        password: [''],
+        confirmPassword: [''],
+      },
+      { validators: this.passwordMatchValidator }
+    );
 
     this.loadProfile();
 
@@ -48,12 +72,12 @@ export class ProfileLivreurComponent implements OnInit {
           name: u.name || '',
           email: u.email || '',
           phone: u.phone || '',
-          address: u.address || ''
+          address: u.address || '',
         });
         this.generateInitials();
         this.profileForm.get('name')?.valueChanges.subscribe(() => this.generateInitials());
       },
-      error: (err: any) => console.error('Erreur lors du chargement du profil:', err)
+      error: (err: any) => console.error('Erreur lors du chargement du profil:', err),
     });
   }
 
@@ -73,7 +97,10 @@ export class ProfileLivreurComponent implements OnInit {
 
   generateInitials(): void {
     const name: string = this.profileForm.get('name')?.value || this.user()?.name || '';
-    const parts = name.trim().split(' ').filter(p => p.length > 0);
+    const parts = name
+      .trim()
+      .split(' ')
+      .filter((p) => p.length > 0);
     if (parts.length >= 2) {
       this.userInitials.set((parts[0][0] + parts[parts.length - 1][0]).toUpperCase());
     } else if (parts.length === 1) {
@@ -93,7 +120,7 @@ export class ProfileLivreurComponent implements OnInit {
       email: this.user()?.email,
       phone: formValue.phone,
       address: formValue.address,
-      ...(formValue.password && { password: formValue.password })
+      ...(formValue.password && { password: formValue.password }),
     };
 
     this.profileService.updateProfile(updatedUser).subscribe({
@@ -110,7 +137,7 @@ export class ProfileLivreurComponent implements OnInit {
       error: (err: any) => {
         this.isLoading.set(false);
         console.error('Erreur lors de la mise à jour:', err);
-      }
+      },
     });
   }
 
@@ -122,12 +149,12 @@ export class ProfileLivreurComponent implements OnInit {
       error: (err: any) => {
         this.isLoading.set(false);
         console.error('Erreur lors de la suppression:', err);
-      }
+      },
     });
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {
-    Object.keys(formGroup.controls).forEach(key => {
+    Object.keys(formGroup.controls).forEach((key) => {
       const control = formGroup.get(key);
       control?.markAsTouched();
       if (control instanceof FormGroup) this.markFormGroupTouched(control);

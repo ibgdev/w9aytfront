@@ -35,8 +35,8 @@ export class Home implements OnInit {
       // return;
     }
     if (user?.role == 'driver') {
-      // this.router.navigateByUrl('/driver');
-      // return;
+      this.router.navigateByUrl('/livreur');
+      return;
     }
   }
 }

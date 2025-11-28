@@ -35,6 +35,16 @@ export class Deliveryall implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const user = this.authService.getCurrentUser();
+
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigateByUrl('/login');
+      return;
+    }
+
+    if (user?.role !== 'driver') {
+      this.router.navigateByUrl('/home');
+      return;
+    }
     this.driverName.set(user?.name || 'Driver');
     this.fetchDeliveries();
   }
