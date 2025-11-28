@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
@@ -28,7 +28,8 @@ export class EditProfileComponent implements OnInit, OnDestroy {
     private companyService: CompanyService,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {
     this.initForm();
   }
@@ -90,12 +91,14 @@ export class EditProfileComponent implements OnInit, OnDestroy {
           address: data.address || ''
         });
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (error: any) => {
         console.error('Error loading profile:', error);
         this.message = 'Failed to load company profile';
         this.messageType = 'error';
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -119,13 +122,16 @@ export class EditProfileComponent implements OnInit, OnDestroy {
         // Clear message after 3 seconds
         setTimeout(() => {
           this.message = '';
+          this.cdr.detectChanges();
         }, 3000);
+        this.cdr.detectChanges();
       },
       error: (error: any) => {
         console.error('Error updating profile:', error);
         this.message = error.message || 'Failed to update profile';
         this.messageType = 'error';
         this.saving = false;
+        this.cdr.detectChanges();
       }
     });
   }

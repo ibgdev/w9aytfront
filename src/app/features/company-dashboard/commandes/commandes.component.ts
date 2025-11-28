@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
@@ -52,17 +52,11 @@ export class CommandesComponent implements OnInit, OnDestroy {
     private deliveryService: DeliveryService,
     private router: Router,
     private route: ActivatedRoute,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
-    // Vérifier que l'utilisateur est authentifié avant de charger
-    if (!this.authService.isLoggedIn()) {
-      console.warn('⚠️ User not authenticated, redirecting to login');
-      this.router.navigate(['/login']);
-      return;
-    }
-
     // Charger les données immédiatement - comme le Livreur Dashboard
     this.loadAllData();
 
@@ -93,7 +87,6 @@ export class CommandesComponent implements OnInit, OnDestroy {
   loadDeliveries() {
     this.loading = true;
     this.error = '';
-    
     this.deliveryService.getAllDeliveries().subscribe({
       next: (response: DeliveryResponse) => {
         if (response.success && response.deliveries) {
@@ -102,12 +95,14 @@ export class CommandesComponent implements OnInit, OnDestroy {
           this.deliveries = [];
         }
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('❌ Error loading deliveries:', err);
         this.error = 'Error loading orders';
         this.deliveries = [];
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }

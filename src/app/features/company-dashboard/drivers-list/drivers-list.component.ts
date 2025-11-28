@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
@@ -45,7 +45,8 @@ export class DriversListComponent implements OnInit, OnDestroy {
   constructor(
     private driverService: DriverService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -73,7 +74,6 @@ export class DriversListComponent implements OnInit, OnDestroy {
   loadDrivers() {
     this.loading = true;
     this.error = '';
-    
     this.driverService.getAllDrivers().subscribe({
       next: (response: DriverResponse) => {
         console.log('🚚 Drivers received:', response);
@@ -83,12 +83,14 @@ export class DriversListComponent implements OnInit, OnDestroy {
           this.drivers = [];
         }
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('❌ Error loading drivers:', err);
         this.error = 'Error loading drivers';
         this.drivers = [];
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }

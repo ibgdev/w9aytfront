@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
@@ -51,7 +51,8 @@ export class StatistiquesComponent implements OnInit, OnDestroy {
   constructor(
     private statisticsService: StatisticsService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -86,18 +87,18 @@ export class StatistiquesComponent implements OnInit, OnDestroy {
         if (response.success && response.statistics) {
           this.stats = response.statistics;
           this.chartsReady = true;
-          
-          // Utiliser requestAnimationFrame pour s'assurer que le DOM est prêt
           setTimeout(() => {
             this.createAllCharts();
           }, 100);
         }
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('❌ Error loading statistics:', err);
         this.error = 'Error loading statistics';
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -109,9 +110,11 @@ export class StatistiquesComponent implements OnInit, OnDestroy {
         if (response.success && response.performance) {
           this.performanceData = response.performance;
         }
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('❌ Error loading performance:', err);
+        this.cdr.detectChanges();
       }
     });
   }
