@@ -28,6 +28,7 @@ export class CommandesComponent implements OnInit, OnDestroy {
   loading: boolean = false;
   error: string = '';
   selectedDelivery: any = null;
+  currentUser: any = null;
 
   newDelivery: AddDeliveryRequest = {
     client_id: 0,
@@ -59,7 +60,18 @@ export class CommandesComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // Charger les données immédiatement - comme le Livreur Dashboard
     this.loadAllData();
+    this.currentUser = this.authService.getCurrentUser();
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigateByUrl('/login');
+      return;
+    }
 
+    const user = this.authService.getCurrentUser();
+    if (user?.role !== 'company') {
+      this.router.navigateByUrl('/home');
+      return;
+
+  }
     // Écouter NavigationEnd pour recharger lors des navigations
     this.router.events
       .pipe(

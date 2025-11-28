@@ -1,6 +1,12 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
@@ -12,7 +18,7 @@ import { AuthService } from '../../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './edit-profile.component.html',
-  styleUrls: ['./edit-profile.component.scss']
+  styleUrls: ['./edit-profile.component.scss'],
 })
 export class EditProfileComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -36,6 +42,15 @@ export class EditProfileComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     const user = this.authService.getCurrentUser();
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigateByUrl('/login');
+      return;
+    }
+
+    if (user?.role !== 'company') {
+      this.router.navigateByUrl('/home');
+      return;
+    }
     if (user?.companyId) {
       this.companyId = user.companyId;
       // Charger les données immédiatement au démarrage
@@ -45,7 +60,7 @@ export class EditProfileComponent implements OnInit, OnDestroy {
     // Recharger les données à chaque navigation vers cette route
     this.router.events
       .pipe(
-        filter(event => event instanceof NavigationEnd),
+        filter((event) => event instanceof NavigationEnd),
         takeUntil(this.destroy$)
       )
       .subscribe((event: NavigationEnd) => {
@@ -70,7 +85,7 @@ export class EditProfileComponent implements OnInit, OnDestroy {
       contact_name: ['', Validators.required],
       email: [{ value: '', disabled: true }],
       phone: ['', Validators.required],
-      address: ['', Validators.required]
+      address: ['', Validators.required],
     });
   }
 
@@ -88,7 +103,7 @@ export class EditProfileComponent implements OnInit, OnDestroy {
           contact_name: data.contact_name || '',
           email: data.email || '',
           phone: data.phone || '',
-          address: data.address || ''
+          address: data.address || '',
         });
         this.loading = false;
         this.cdr.detectChanges();
@@ -99,7 +114,7 @@ export class EditProfileComponent implements OnInit, OnDestroy {
         this.messageType = 'error';
         this.loading = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -132,7 +147,7 @@ export class EditProfileComponent implements OnInit, OnDestroy {
         this.messageType = 'error';
         this.saving = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 

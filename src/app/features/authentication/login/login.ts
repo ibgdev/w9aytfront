@@ -17,7 +17,7 @@ export class Login implements OnInit {
       if (user?.role === 'driver') {
         this.router.navigateByUrl('/livreur/deliveries');
       } else if (user?.role === 'company') {
-        this.router.navigateByUrl('/company');
+        this.router.navigateByUrl('company/commandes');
       } else if (user?.role === 'admin') {
         this.router.navigateByUrl('/admin');
       } else {
@@ -80,6 +80,11 @@ export class Login implements OnInit {
       next: (res) => {
         this.loading.set(false);
         if (res.success && res.token && res.user) {
+          // Only save session if company is active
+          if (res.user.role === 'company' && res.user.status !== 'active') {
+            this.errorMessage.set('Your company account is not verified yet by the administrator. If you have any problems, please contact us.');
+            return;
+          }
           this.auth.saveSession(res.token, res.user);
           // Redirect based on user role
           if (res.user.role === 'driver') {

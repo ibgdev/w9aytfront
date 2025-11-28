@@ -143,7 +143,16 @@
             type="number" 
             formControlName="packageWeight" 
             placeholder="Weight in KG" 
+            min="0.1"
+            max="99.9"
+            step="0.1"
           />
+          <div class="error-message" *ngIf="form.get('packageWeight')?.invalid && form.get('packageWeight')?.touched">
+            <span *ngIf="form.get('packageWeight')?.errors?.['required']">Package weight is required</span>
+            <span *ngIf="form.get('packageWeight')?.errors?.['invalidNumber']">Please enter a valid number</span>
+            <span *ngIf="form.get('packageWeight')?.errors?.['tooSmall']">Weight must be greater than 0 kg</span>
+            <span *ngIf="form.get('packageWeight')?.errors?.['tooLarge']">Weight must be less than 100 kg</span>
+          </div>
         </div>
 
         <!-- Package Size -->

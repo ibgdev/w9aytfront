@@ -1,6 +1,6 @@
 // src/app/features/new-delivery/new-delivery.component.ts
 import { Component, AfterViewInit, OnDestroy, inject, OnInit, signal } from '@angular/core';
-import { FormControl, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
+import { FormControl, ReactiveFormsModule, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, switchMap } from 'rxjs/operators';
 import * as L from 'leaflet';
@@ -54,7 +54,7 @@ export class NewDeliveryComponent implements AfterViewInit, OnDestroy,OnInit {
       dropoffAddress: this.dropoffAddress,
       receiverName: new FormControl('', Validators.required),
       receiverPhone: new FormControl('', [Validators.required, Validators.pattern(/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/)]),
-      packageWeight: new FormControl(null, [Validators.required, Validators.min(0)]),
+      packageWeight: new FormControl(null, [Validators.required, this.weightRangeValidator]),
       packageSize: new FormControl('M', Validators.required),
       paymentMethod: new FormControl('Cash on Delivery', Validators.required),
     });
@@ -73,6 +73,24 @@ export class NewDeliveryComponent implements AfterViewInit, OnDestroy,OnInit {
     (L.Marker as any).prototype.options.icon = defaultIcon;
 
     console.log('Default Leaflet icon assigned:', defaultIcon);
+  }
+
+  // Validator: weight must be > 0 and < 100
+  weightRangeValidator(control: AbstractControl): ValidationErrors | null {
+    const v = Number(control.value);
+    if (control.value === null || control.value === undefined || control.value === '') {
+      return null; // required validator handles empty
+    }
+    if (isNaN(v)) {
+      return { invalidNumber: true };
+    }
+    if (v <= 0) {
+      return { tooSmall: { requiredGreaterThan: 0, actual: v } };
+    }
+    if (v >= 100) {
+      return { tooLarge: { requiredLessThan: 100, actual: v } };
+    }
+    return null;
   }
   ngOnInit(): void {
     this.getCompanies();
@@ -243,7 +261,11 @@ export class NewDeliveryComponent implements AfterViewInit, OnDestroy,OnInit {
   computePrice(): number {
     const base = 5; // base price
     const sizeRate = this.form.get('packageSize')?.value === 'S' ? 3 : this.form.get('packageSize')?.value === 'M' ? 5 : 7;
-    const weight = Number(this.form.get('packageWeight')?.value) || 0;
+    const raw = Number(this.form.get('packageWeight')?.value);
+    let weight = 0;
+    if (!isNaN(raw) && raw > 0) {
+      weight = Math.min(raw, 99.99); // clamp to <100
+    }
     const weightRate = weight * 1.2;
     const price = base + sizeRate + weightRate;
     return Math.round(price * 100) / 100;

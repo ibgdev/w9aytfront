@@ -5,17 +5,24 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import Swal from 'sweetalert2';
-import { DriverService, Driver, AddDriverRequest, DriverResponse } from '../../../core/services/company/driver.service';
+import {
+  DriverService,
+  Driver,
+  AddDriverRequest,
+  DriverResponse,
+} from '../../../core/services/company/driver.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-drivers-list',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './drivers-list.component.html',
-  styleUrls: ['./drivers-list.component.scss']
+  styleUrls: ['./drivers-list.component.scss'],
 })
 export class DriversListComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+  private errorTimeout: any = null;
   drivers: Driver[] = [];
   searchTerm: string = '';
   showAddModal: boolean = false;
@@ -24,13 +31,16 @@ export class DriversListComponent implements OnInit, OnDestroy {
   loading: boolean = false;
   error: string = '';
   selectedDriver: any = null;
+  showErrorAlert: boolean = false;
+  
+  currentUser: any = null;
 
   newDriver: AddDriverRequest = {
     patronim: '',
     telephone: '',
     email: '',
     motDePasse: '',
-    zoneCouverture: ''
+    zoneCouverture: '',
   };
 
   editDriver: any = {
@@ -39,24 +49,36 @@ export class DriversListComponent implements OnInit, OnDestroy {
     telephone: '',
     email: '',
     zoneCouverture: '',
-    status: 'available'
+    status: 'available',
   };
 
   constructor(
     private driverService: DriverService,
     private router: Router,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private auth: AuthService
   ) {}
 
   ngOnInit() {
+    this.currentUser = this.auth.getCurrentUser();
+    if (!this.auth.isLoggedIn()) {
+      this.router.navigateByUrl('/login');
+      return;
+    }
+
+    const user = this.auth.getCurrentUser();
+    if (user?.role !== 'company') {
+      this.router.navigateByUrl('/home');
+      return;
+    }
     // Charger les données immédiatement - comme le Livreur Dashboard
     this.loadDrivers();
 
     // Écouter NavigationEnd pour recharger lors des navigations
     this.router.events
       .pipe(
-        filter(event => event instanceof NavigationEnd),
+        filter((event) => event instanceof NavigationEnd),
         takeUntil(this.destroy$)
       )
       .subscribe((event: NavigationEnd) => {
@@ -91,18 +113,19 @@ export class DriversListComponent implements OnInit, OnDestroy {
         this.drivers = [];
         this.loading = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
   get filteredDrivers() {
     if (!this.searchTerm) return this.drivers;
-    
+
     const searchLower = this.searchTerm.toLowerCase();
-    return this.drivers.filter(driver =>
-      driver.patronim.toLowerCase().includes(searchLower) ||
-      driver.phone_number.includes(this.searchTerm) ||
-      driver.email.toLowerCase().includes(searchLower)
+    return this.drivers.filter(
+      (driver) =>
+        driver.patronim.toLowerCase().includes(searchLower) ||
+        driver.phone_number.includes(this.searchTerm) ||
+        driver.email.toLowerCase().includes(searchLower)
     );
   }
 
@@ -119,8 +142,12 @@ export class DriversListComponent implements OnInit, OnDestroy {
   }
 
   addDriver() {
-    if (!this.newDriver.patronim || !this.newDriver.telephone || 
-        !this.newDriver.email || !this.newDriver.motDePasse) {
+    if (
+      !this.newDriver.patronim ||
+      !this.newDriver.telephone ||
+      !this.newDriver.email ||
+      !this.newDriver.motDePasse
+    ) {
       this.error = 'All required fields must be filled';
       return;
     }
@@ -137,19 +164,37 @@ export class DriversListComponent implements OnInit, OnDestroy {
             title: 'Success!',
             text: 'Driver added successfully!',
             timer: 2000,
-            showConfirmButton: false
+            showConfirmButton: false,
           });
           this.loadDrivers();
           this.closeAddModal();
         }
         this.loading = false;
+        this.showErrorAlert = false;
       },
       error: (err) => {
         console.error('❌ Error adding driver:', err);
-        this.error = err.error || 'Error adding driver';
+        this.error = (err.error && err.error.error) ? err.error.error : (err.error || 'Error adding driver');
         this.loading = false;
-      }
+        this.showErrorAlert = true;
+        // Manually trigger change detection because the app runs in zoneless mode
+        try { this.cdr.detectChanges(); } catch (e) { /* ignore */ }
+        // auto-dismiss after 3.5s
+        try { if (this.errorTimeout) { clearTimeout(this.errorTimeout); this.errorTimeout = null; } } catch(e) {}
+        this.errorTimeout = setTimeout(() => {
+          this.closeErrorAlert();
+          this.errorTimeout = null;
+        }, 3500);
+      },
     });
+  }
+
+  closeErrorAlert() {
+    // clear any pending timeout
+    try { if (this.errorTimeout) { clearTimeout(this.errorTimeout); this.errorTimeout = null; } } catch(e) {}
+    this.showErrorAlert = false;
+    this.error = '';
+    try { this.cdr.detectChanges(); } catch (e) { /* ignore */ }
   }
 
   resetForm() {
@@ -158,7 +203,7 @@ export class DriversListComponent implements OnInit, OnDestroy {
       telephone: '',
       email: '',
       motDePasse: '',
-      zoneCouverture: ''
+      zoneCouverture: '',
     };
   }
 
@@ -176,9 +221,9 @@ export class DriversListComponent implements OnInit, OnDestroy {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Error loading details'
+          text: 'Error loading details',
         });
-      }
+      },
     });
   }
 
@@ -199,7 +244,7 @@ export class DriversListComponent implements OnInit, OnDestroy {
             telephone: d.phone_number,
             email: d.email,
             zoneCouverture: d.zone_couverture,
-            status: d.status
+            status: d.status,
           };
           this.showEditModal = true;
         }
@@ -209,9 +254,9 @@ export class DriversListComponent implements OnInit, OnDestroy {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Error loading data'
+          text: 'Error loading data',
         });
-      }
+      },
     });
   }
 
@@ -223,44 +268,46 @@ export class DriversListComponent implements OnInit, OnDestroy {
       telephone: '',
       email: '',
       zoneCouverture: '',
-      status: 'available'
+      status: 'available',
     };
   }
 
   saveEdit() {
     this.loading = true;
-    
-    this.driverService.updateDriver(this.editDriver.id, {
-      patronim: this.editDriver.patronim,
-      telephone: this.editDriver.telephone,
-      email: this.editDriver.email,
-      zoneCouverture: this.editDriver.zoneCouverture,
-      status: this.editDriver.status
-    }).subscribe({
-      next: (response) => {
-        if (response.success) {
+
+    this.driverService
+      .updateDriver(this.editDriver.id, {
+        patronim: this.editDriver.patronim,
+        telephone: this.editDriver.telephone,
+        email: this.editDriver.email,
+        zoneCouverture: this.editDriver.zoneCouverture,
+        status: this.editDriver.status,
+      })
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: 'Driver updated successfully!',
+              timer: 2000,
+              showConfirmButton: false,
+            });
+            this.loadDrivers();
+            this.closeEditModal();
+          }
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('Error updating:', err);
           Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: 'Driver updated successfully!',
-            timer: 2000,
-            showConfirmButton: false
+            icon: 'error',
+            title: 'Error',
+            text: 'Error updating driver',
           });
-          this.loadDrivers();
-          this.closeEditModal();
-        }
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error updating:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Error updating driver'
-        });
-        this.loading = false;
-      }
-    });
+          this.loading = false;
+        },
+      });
   }
 
   // DELETE
@@ -273,11 +320,11 @@ export class DriversListComponent implements OnInit, OnDestroy {
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel'
+      cancelButtonText: 'Cancel',
     }).then((result) => {
       if (result.isConfirmed) {
         this.loading = true;
-        
+
         this.driverService.deleteDriver(driver.id).subscribe({
           next: (response) => {
             if (response.success) {
@@ -286,7 +333,7 @@ export class DriversListComponent implements OnInit, OnDestroy {
                 title: 'Deleted!',
                 text: 'Driver deleted successfully!',
                 timer: 2000,
-                showConfirmButton: false
+                showConfirmButton: false,
               });
               this.loadDrivers();
             }
@@ -297,10 +344,10 @@ export class DriversListComponent implements OnInit, OnDestroy {
             Swal.fire({
               icon: 'error',
               title: 'Error',
-              text: 'Error deleting driver'
+              text: 'Error deleting driver',
             });
             this.loading = false;
-          }
+          },
         });
       }
     });
@@ -308,20 +355,20 @@ export class DriversListComponent implements OnInit, OnDestroy {
 
   getStatusClass(status: string): string {
     const statusMap: { [key: string]: string } = {
-      'available': 'status-disponible',
-      'busy': 'status-occupe',
-      'suspended': 'status-inactif',
-      'offline': 'status-inactif'
+      available: 'status-disponible',
+      busy: 'status-occupe',
+      suspended: 'status-inactif',
+      offline: 'status-inactif',
     };
     return statusMap[status?.toLowerCase()] || '';
   }
 
   getStatusLabel(status: string): string {
     const labelMap: { [key: string]: string } = {
-      'available': 'Available',
-      'busy': 'Busy',
-      'suspended': 'Suspended',
-      'offline': 'Offline'
+      available: 'Available',
+      busy: 'Busy',
+      suspended: 'Suspended',
+      offline: 'Offline',
     };
     return labelMap[status?.toLowerCase()] || status || 'Unknown';
   }

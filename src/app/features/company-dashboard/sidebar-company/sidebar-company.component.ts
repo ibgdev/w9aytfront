@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, takeUntil } from 'rxjs/operators';
@@ -59,7 +59,8 @@ export class SidebarCompanyComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private companyService: CompanyService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -113,11 +114,13 @@ export class SidebarCompanyComponent implements OnInit, OnDestroy {
           const companyData = response.data || response;
           this.companyName = companyData.name || 'Company';
           this.avatarLetter = this.companyName.charAt(0).toUpperCase();
+          this.cdr.detectChanges();
         },
         error: (error: any) => {
           console.error('Error loading company info:', error);
           this.companyName = 'Company';
           this.avatarLetter = 'C';
+          this.cdr.detectChanges();
         }
       });
     }
