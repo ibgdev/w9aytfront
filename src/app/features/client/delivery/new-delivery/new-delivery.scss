@@ -9,6 +9,7 @@ $bg-light: #f8f9fa;
 $light-text: #b8c5d6;
 $border-light: #e0e0e0;
 $text-secondary: #6c757d;
+$text-primary: #1f2937;
 
 // Font
 $font-family: 'Poppins', sans-serif;
@@ -148,6 +149,15 @@ html, body {
       border-color: $secondary-color;
       box-shadow: 0 0 0 4px rgba(231, 122, 40, 0.1);
       background: rgba(231, 122, 40, 0.02);
+    }
+
+    // readonly inputs appear uneditable
+    &[readonly], &[aria-readonly='true'] {
+      background: #f3f4f6;
+      color: $text-primary;
+      cursor: not-allowed;
+      border-color: rgba(0,0,0,0.06);
+      box-shadow: none;
     }
 
     &:hover:not(:focus) {
