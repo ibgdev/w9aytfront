@@ -81,7 +81,7 @@ export interface AddDeliveryRequest {
 export class DeliveryService {
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
-  private readonly API_URL = 'http://localhost:3200/api/company/deliveries';
+  private readonly API_URL = 'https://w9aytdelivery.onrender.com/api/company/deliveries';
 
   private getHttpOptions(): { headers: HttpHeaders } {
     const token = this.authService.getToken();

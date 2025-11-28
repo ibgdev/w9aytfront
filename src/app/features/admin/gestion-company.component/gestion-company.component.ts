@@ -350,6 +350,6 @@ export class GestionCompany implements OnInit, OnDestroy {
 
   getLogoUrl(logoFilename: string): string {
     if (!logoFilename) return 'assets/default-company-logo.png';
-    return `http://localhost:3200/uploads/${logoFilename}`;
+    return `https://w9aytdelivery.onrender.com/uploads/${logoFilename}`;
   }
 }

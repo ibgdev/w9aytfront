@@ -40,7 +40,7 @@ export interface DeleteAccountResponse {
 })
 export class ProfileService {
   private readonly http = inject(HttpClient);
-  private readonly API_URL = 'http://localhost:3200/api/profile';
+  private readonly API_URL = 'https://w9aytdelivery.onrender.com/api/profile';
 
   updateProfile(data: UpdateProfileRequest): Observable<UpdateProfileResponse> {
     return this.http

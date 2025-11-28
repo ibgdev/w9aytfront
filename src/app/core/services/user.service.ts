@@ -19,7 +19,7 @@ export interface User {
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:3200/user'; // Ajustez le port selon votre backend
+  private apiUrl = 'https://w9aytdelivery.onrender.com/user';
 
   constructor(private http: HttpClient) {}
 

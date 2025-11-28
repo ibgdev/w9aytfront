@@ -6,13 +6,8 @@ import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
-  private baseUrl = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
-    ? 'http://localhost:3200/api/chat'
-    : '/api/chat';
-  
-  private socketUrl = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
-    ? 'http://localhost:3200'
-    : '';
+  private baseUrl = 'https://w9aytdelivery.onrender.com/api/chat';
+  private socketUrl = 'https://w9aytdelivery.onrender.com';
 
   private socket: Socket | null = null;
   private messageSubject = new Subject<any>();

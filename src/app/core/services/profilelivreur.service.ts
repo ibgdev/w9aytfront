@@ -7,8 +7,8 @@ import { User } from '../models/user.model';
 @Injectable({ providedIn: 'root' })
 export class ProfileLivreurService {
   private baseUrl = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
-    ? 'http://localhost:3200/api/profilelivreur'
-    : '/api/profilelivreur';
+    ? 'https://w9aytdelivery.onrender.com/api/profilelivreur'
+    : 'https://w9aytdelivery.onrender.com/api/profilelivreur';
 
   constructor(
     private http: HttpClient,

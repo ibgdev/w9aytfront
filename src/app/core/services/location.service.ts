@@ -8,8 +8,8 @@ export class LocationService {
   // In dev (running on localhost:4200) call backend directly to avoid the dev server returning
   // index.html for `/api/*` routes which causes HttpClient parsing errors.
   private baseUrl = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
-    ? 'http://localhost:3200/api/location'
-    : '/api/location'; // production: use relative path
+    ? 'https://w9aytdelivery.onrender.com/api/location'
+    : 'https://w9aytdelivery.onrender.com/api/location';
 
   constructor(private http: HttpClient) {}
 

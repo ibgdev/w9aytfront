@@ -26,7 +26,7 @@ export interface ContactResponse {
   providedIn: 'root'
 })
 export class ContactService {
-  private apiUrl = 'http://localhost:3200/api/contact';
+  private apiUrl = 'https://w9aytdelivery.onrender.com/api/contact';
 
   constructor(private http: HttpClient) {}
 

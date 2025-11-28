@@ -17,7 +17,7 @@ export interface Company {
   providedIn: 'root'
 })
 export class CompanyService {
-  private apiUrl = 'http://localhost:3200/company';
+  private apiUrl = 'https://w9aytdelivery.onrender.com/company';
 
   constructor(private http: HttpClient) {}
 

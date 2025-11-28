@@ -44,7 +44,7 @@ export interface CompanyProfile {
 export class CompanyService {
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
-  private readonly API_URL = 'http://localhost:3200/api/company';
+  private readonly API_URL = 'https://w9aytdelivery.onrender.com/api/company';
 
   private getHttpOptions(): { headers: HttpHeaders } {
     const token = this.authService.getToken();

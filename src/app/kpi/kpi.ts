@@ -35,7 +35,7 @@ export class KpiComponent implements OnInit {
     this.error = null;
 
     // Build URL with query params to limit KPIs to the logged-in user
-    const base = 'http://localhost:3200/api/kpi/deliveries';
+    const base = 'https://w9aytdelivery.onrender.com/api/kpi/deliveries';
     const currentUser = this.auth.getCurrentUser();
 
     // If no logged-in user, do NOT call the API (avoid returning global totals)

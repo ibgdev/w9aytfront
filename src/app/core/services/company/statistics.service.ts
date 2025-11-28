@@ -49,7 +49,7 @@ export interface StatisticsResponse {
 export class StatisticsService {
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
-  private readonly API_URL = 'http://localhost:3200/api/company/statistics';
+  private readonly API_URL = 'https://w9aytdelivery.onrender.com/api/company/statistics';
 
   private getHttpOptions(): { headers: HttpHeaders } {
     const token = this.authService.getToken();

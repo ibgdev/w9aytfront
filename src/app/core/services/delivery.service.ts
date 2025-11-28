@@ -4,9 +4,7 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class DeliveryService {
-  private baseUrl = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
-    ? 'http://localhost:3200/api/delivery'
-    : '/api/delivery';
+  private baseUrl = 'https://w9aytdelivery.onrender.com/api/delivery';
 
   constructor(private http: HttpClient) {}
 

@@ -88,7 +88,7 @@ export interface VerifyEmailResponse {
 })
 export class AuthService {
   private readonly http = inject(HttpClient);
-  private readonly API_URL = 'http://localhost:3200/api/auth';
+  private readonly API_URL = 'https://w9aytdelivery.onrender.com/api/auth';
 
   signUp(data: SignUpRequest): Observable<SignUpResponse> {
     return this.http

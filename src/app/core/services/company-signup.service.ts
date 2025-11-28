@@ -36,7 +36,7 @@ export interface CompanyResponse {
 })
 export class CompanyService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3200/company';
+  private apiUrl = 'https://w9aytdelivery.onrender.com/company';
 
   registerCompany(company: Company, logoFile?: File | null): Observable<RegisterResponse> {
   const formData = new FormData();

@@ -33,7 +33,7 @@ export interface SingleCompanyResponse {
 })
 export class AllCompaniesService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3200/api/allCompanies';
+  private apiUrl = 'https://w9aytdelivery.onrender.com/api/allCompanies';
 
   getAllCompanies(): Observable<PublicCompany[]> {
     return this.http.get<AllCompaniesResponse>(this.apiUrl).pipe(

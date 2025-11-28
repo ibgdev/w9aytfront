@@ -39,9 +39,8 @@ export interface DeliveryResponse {
 
 @Injectable({ providedIn: 'root' })
 export class DeliveriesService {
-  private baseUrl = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
-    ? 'http://localhost:3200/api/deliveries'
-    : '/api/deliveries';
+  // Always use production API host
+  private baseUrl = 'https://w9aytdelivery.onrender.com/api/deliveries';
 
   constructor(
     private http: HttpClient,
